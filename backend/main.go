@@ -1,10 +1,11 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
-	"os"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type Response struct {
@@ -12,55 +13,37 @@ type Response struct {
 	Status  string `json:"status"`
 }
 
-func healthHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
+func healthHandler(c echo.Context) error {
 	response := Response{
 		Message: "Backend is running",
 		Status:  "ok",
 	}
-
-	json.NewEncoder(w).Encode(response)
+	return c.JSON(http.StatusOK, response)
 }
 
-func apiHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
+func apiHandler(c echo.Context) error {
 	response := Response{
 		Message: "Hello from Go backend!",
 		Status:  "success",
 	}
-
-	json.NewEncoder(w).Encode(response)
+	return c.JSON(http.StatusOK, response)
 }
 
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
+	e := echo.New()
 
-	http.HandleFunc("/health", healthHandler)
-	http.HandleFunc("/api/hello", apiHandler)
+	// Middleware
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+	e.Use(middleware.CORS())
 
+	// Routes
+	e.GET("/health", healthHandler)
+	e.GET("/api/hello", apiHandler)
+
+	port := ":8080"
 	log.Printf("Server starting on port %s", port)
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
+	if err := e.Start(port); err != nil {
 		log.Fatal(err)
 	}
 }
