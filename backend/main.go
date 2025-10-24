@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 )
 
 type Response struct {
@@ -31,11 +30,6 @@ func apiHandler(c echo.Context) error {
 
 func main() {
 	e := echo.New()
-
-	// Middleware
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-	e.Use(middleware.CORS())
 
 	// Routes
 	e.GET("/health", healthHandler)
