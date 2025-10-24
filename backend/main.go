@@ -4,7 +4,10 @@ import (
 	"log"
 	"net/http"
 
+	"zerodelay/auth"
+
 	"github.com/labstack/echo/v4"
+	
 )
 
 type Response struct {
@@ -20,20 +23,21 @@ func healthHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
-func apiHandler(c echo.Context) error {
-	response := Response{
-		Message: "Hello from Go backend!",
-		Status:  "success",
-	}
-	return c.JSON(http.StatusOK, response)
-}
-
 func main() {
+
+	auth.InitFirebase()
+
 	e := echo.New()
 
 	// Routes
 	e.GET("/health", healthHandler)
-	e.GET("/api/hello", apiHandler)
+
+	e.POST("/signup", auth.SignUpHandler)
+	e.POST("/login", auth.LoginHandler)
+
+	// Protected routes
+	api := e.Group("/api")
+	api.Use(auth.FirebaseAuthMiddleware)
 
 	port := ":8080"
 	log.Printf("Server starting on port %s", port)
