@@ -1,58 +1,97 @@
-"use client";
-
-import { useEffect, useState } from "react";
-
-interface BackendResponse {
-  message: string;
-  status: string;
-}
-
 export default function Home() {
-  const [backendMessage, setBackendMessage] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>("");
-
-  useEffect(() => {
-    const fetchBackendData = async () => {
-      try {
-        const response = await fetch("http://localhost:8080/api/hello");
-        if (!response.ok) {
-          throw new Error("Failed to fetch from backend");
-        }
-        const data: BackendResponse = await response.json();
-        setBackendMessage(data.message);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBackendData();
-  }, []);
-
   return (
-    <div style={{ padding: "2rem", fontFamily: "system-ui, sans-serif" }}>
-      <h1>ZeroDelay Application</h1>
-      <div style={{ marginTop: "2rem" }}>
-        <h2>Frontend Status</h2>
-        <p>✅ Next.js is running successfully!</p>
+    <div style={styles.container}>
+      {/* 検索バー */}
+      <div style={styles.searchBar}>
+        <input
+          type="text"
+          placeholder="住所・施設名を入力"
+          style={styles.searchInput}
+        />
       </div>
-      <div style={{ marginTop: "2rem" }}>
-        <h2>Backend Status</h2>
-        {loading && <p>Loading backend data...</p>}
-        {error && <p style={{ color: "red" }}>❌ Error: {error}</p>}
-        {backendMessage && (
-          <p style={{ color: "green" }}>✅ {backendMessage}</p>
-        )}
+
+      {/* 災害ボタン */}
+      <div style={styles.buttons}>
+        <button style={styles.button}>洪水</button>
+        <button style={styles.button}>土砂</button>
+        <button style={styles.button}>津波</button>
+        <button style={styles.button}>地震</button>
       </div>
-      <div style={{ marginTop: "2rem", fontSize: "0.875rem", color: "#666" }}>
-        <p>
-          Frontend running on port 3000
-          <br />
-          Backend running on port 8080
-        </p>
+
+      {/* 地図エリア */}
+      <div style={styles.mapArea}>🗺️ 地図エリア（現在地＋避難所）</div>
+
+      {/* 警報表示 */}
+      <div style={styles.alert}>⚠️ 現在の警報：金沢市に大雨警報発令中</div>
+
+      {/* ナビゲーション */}
+      <div style={styles.nav}>
+      <a href="/" style={styles.link}>🏠 ホーム</a>
+      <span>📡 情報</span>
+      <a href="/setting" style={styles.link}>⚙️ 設定</a>
+      <span>👤 マイページ</span>
       </div>
     </div>
   );
 }
+
+const styles: { [key: string]: React.CSSProperties } = {
+  link: {
+  textDecoration: "none",
+  color: "black",
+  },
+
+  container: {
+    fontFamily: "sans-serif",
+    textAlign: "center",
+    backgroundColor: "#f0f4ff",
+    height: "100vh",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+  },
+  searchBar: {
+    padding: "10px",
+    backgroundColor: "#fff",
+    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+  },
+  searchInput: {
+    width: "80%",
+    padding: "8px",
+    fontSize: "16px",
+  },
+  buttons: {
+    display: "flex",
+    justifyContent: "space-around",
+    padding: "10px",
+  },
+  button: {
+    padding: "10px 20px",
+    backgroundColor: "#4A90E2",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    fontSize: "16px",
+    cursor: "pointer",
+  },
+  mapArea: {
+    flex: 1,
+    backgroundColor: "#d9e6ff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "18px",
+  },
+  alert: {
+    backgroundColor: "#ffeb3b",
+    padding: "10px",
+    fontWeight: "bold",
+  },
+  nav: {
+    display: "flex",
+    justifyContent: "space-around",
+    backgroundColor: "#fff",
+    padding: "10px",
+    borderTop: "1px solid #ccc",
+  },
+};
