@@ -26,21 +26,15 @@ export default function Home() {
 
       {/* ナビゲーション */}
       <div style={styles.nav}>
-      <a href="/" style={styles.link}>🏠 ホーム</a>
-      <span>📡 情報</span>
-      <a href="/setting" style={styles.link}>⚙️ 設定</a>
-      <span>👤 マイページ</span>
+        <span>🏠 ホーム</span>
+        <span>📡 情報</span>
+        <a href="/setting" style={styles.link}>⚙️ 設定</a>
       </div>
     </div>
   );
 }
 
 const styles: { [key: string]: React.CSSProperties } = {
-  link: {
-  textDecoration: "none",
-  color: "black",
-  },
-
   container: {
     fontFamily: "sans-serif",
     textAlign: "center",
@@ -93,5 +87,9 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundColor: "#fff",
     padding: "10px",
     borderTop: "1px solid #ccc",
+  },
+  link: {
+    textDecoration: "none",
+    color: "black",
   },
 };
