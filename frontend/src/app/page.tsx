@@ -1,15 +1,15 @@
-"use client"; 
-import { useEffect, useState } from "react";  // ← 追加！
+"use client"; // ← これが必要！
+
+import { useEffect, useState } from "react";
 
 export default function Home() {
-  // ← ここで警報メッセージを管理
+  // ⚠️ 警報テキストを状態管理
   const [alertText, setAlertText] = useState("警報情報を取得中...");
 
+  // ⏳ 5分ごとに気象庁API（石川県）から情報取得
   useEffect(() => {
-    // 警報データを取得する関数
     const fetchAlert = async () => {
       try {
-        // さっき作った APIルート（/app/api/alert/route.ts）を呼び出す
         const res = await fetch("/api/alert", { cache: "no-store" });
         const data = await res.json();
 
@@ -29,17 +29,14 @@ export default function Home() {
       }
     };
 
-    // 最初に1回実行
-    fetchAlert();
-    // 5分ごとに自動更新
-    const timer = setInterval(fetchAlert, 5 * 60 * 1000);
+    fetchAlert(); // 初回実行
+    const timer = setInterval(fetchAlert, 5 * 60 * 1000); // 5分ごと
     return () => clearInterval(timer);
   }, []);
 
-  // ↓↓↓ ここから下は元のままでOK。ただし alert 部分だけ置き換え ↓↓↓
   return (
     <div style={styles.container}>
-      {/* 検索バー */}
+      {/* 🔍 検索バー */}
       <div style={styles.searchBar}>
         <input
           type="text"
@@ -48,7 +45,7 @@ export default function Home() {
         />
       </div>
 
-      {/* 災害ボタン */}
+      {/* 🌊 災害ボタン */}
       <div style={styles.buttons}>
         <button style={styles.button}>洪水</button>
         <button style={styles.button}>土砂</button>
@@ -56,22 +53,25 @@ export default function Home() {
         <button style={styles.button}>地震</button>
       </div>
 
-      {/* 地図エリア */}
+      {/* 🗺️ 地図エリア */}
       <div style={styles.mapArea}>🗺️ 地図エリア（現在地＋避難所）</div>
 
-      {/* 警報表示（ここだけ変える） */}
+      {/* ⚠️ 警報表示 */}
       <div style={styles.alert}>{alertText}</div>
 
-      {/* ナビゲーション */}
+      {/* 🧭 ナビゲーション */}
       <div style={styles.nav}>
         <span>🏠 ホーム</span>
         <span>📡 情報</span>
-        <a href="/setting" style={styles.link}>⚙️ 設定</a>
+        <a href="/setting" style={styles.link}>
+          ⚙️ 設定
+        </a>
       </div>
     </div>
   );
 }
 
+// 💅 スタイル設定（レスポンシブ対応済み）
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
     fontFamily: "sans-serif",
@@ -81,6 +81,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
+    fontSize: "var(--app-font-size)", // ←画面幅で文字サイズ変化
   },
   searchBar: {
     padding: "10px",
@@ -90,7 +91,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   searchInput: {
     width: "80%",
     padding: "8px",
-    fontSize: "16px",
+    fontSize: "var(--app-font-size)",
   },
   buttons: {
     display: "flex",
@@ -98,12 +99,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     padding: "10px",
   },
   button: {
-    padding: "10px 20px",
+    padding: "var(--button-padding)",
     backgroundColor: "#4A90E2",
     color: "#fff",
     border: "none",
     borderRadius: "6px",
-    fontSize: "16px",
+    fontSize: "var(--app-font-size)",
     cursor: "pointer",
   },
   mapArea: {
@@ -112,12 +113,13 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "18px",
+    fontSize: "var(--app-font-size)",
   },
   alert: {
     backgroundColor: "#ffeb3b",
     padding: "10px",
     fontWeight: "bold",
+    fontSize: "var(--app-font-size)",
   },
   nav: {
     display: "flex",
