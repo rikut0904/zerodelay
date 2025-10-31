@@ -1,4 +1,42 @@
+"use client"; 
+import { useEffect, useState } from "react";  // ← 追加！
+
 export default function Home() {
+  // ← ここで警報メッセージを管理
+  const [alertText, setAlertText] = useState("警報情報を取得中...");
+
+  useEffect(() => {
+    // 警報データを取得する関数
+    const fetchAlert = async () => {
+      try {
+        // さっき作った APIルート（/app/api/alert/route.ts）を呼び出す
+        const res = await fetch("/api/alert", { cache: "no-store" });
+        const data = await res.json();
+
+        if (!data.hasAny) {
+          setAlertText("✅ 石川県に警報・注意報は発令されていません");
+          return;
+        }
+
+        const parts: string[] = [];
+        if (data.buckets.special.length) parts.push("🟣特別警報");
+        if (data.buckets.warning.length) parts.push("🔴警報");
+        if (data.buckets.advisory.length) parts.push("🟡注意報");
+
+        setAlertText(`⚠️ 石川県の発表状況：${parts.join("・")}`);
+      } catch {
+        setAlertText("⚠️ 警報情報の取得に失敗しました");
+      }
+    };
+
+    // 最初に1回実行
+    fetchAlert();
+    // 5分ごとに自動更新
+    const timer = setInterval(fetchAlert, 5 * 60 * 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // ↓↓↓ ここから下は元のままでOK。ただし alert 部分だけ置き換え ↓↓↓
   return (
     <div style={styles.container}>
       {/* 検索バー */}
@@ -21,8 +59,8 @@ export default function Home() {
       {/* 地図エリア */}
       <div style={styles.mapArea}>🗺️ 地図エリア（現在地＋避難所）</div>
 
-      {/* 警報表示 */}
-      <div style={styles.alert}>⚠️ 現在の警報：金沢市に大雨警報発令中</div>
+      {/* 警報表示（ここだけ変える） */}
+      <div style={styles.alert}>{alertText}</div>
 
       {/* ナビゲーション */}
       <div style={styles.nav}>

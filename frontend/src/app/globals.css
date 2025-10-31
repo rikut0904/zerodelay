@@ -40,3 +40,12 @@ a {
     --background-end-rgb: 0, 0, 0;
   }
 }
+
+:root {
+  --app-font-size: 16px; /* デフォルト文字サイズ */
+}
+
+body {
+  font-size: 16px; /* 固定 */
+  transition: font-size 0.2s ease;
+}
