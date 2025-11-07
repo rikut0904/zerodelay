@@ -1,30 +1,33 @@
 # ZeroDelay Application
 
-Next.js + Go application with Docker
+本アプリケーションは金沢工業大学工学部情報工学科2年PD実践のEP-F5班で制作しているアプリケーションです。本アプリケーションは金沢市の「水害に備えて～ハザードマップを活用した自主防災～」というテーマを解決するために、金沢市ハザードマップを簡単にWebサイトで閲覧することができ、パーソナライズされたアプリケーションを開発しています。
 
-## Prerequisites
+## 前提条件
 
-- Docker version 28.4.0 or higher
-- Docker Compose
+- Go: 1.25.2
+- Node.js: 24.9.0
+- npm: 11.6.0
+- Next.js: 15.1.6
+- Docker: 28.4.0
 
-## Project Structure
+## ディレクトリ構成
 
 ```
 zerodelay/
-├── backend/          # Go backend
+├── backend/          # バックエンド（Go）
 │   ├── main.go
 │   ├── go.mod
 │   └── Dockerfile
-├── frontend/         # Next.js frontend
+├── frontend/         # フロントエンド(Next.js)
 │   ├── src/
 │   ├── package.json
 │   └── Dockerfile
 └── docker-compose.yml
 ```
 
-## Getting Started
+## 実行方法
 
-### Build and run with Docker Compose
+### Docker Compose（結合テスト）
 
 ```bash
 docker-compose up --build
@@ -37,19 +40,18 @@ docker-compose up --build
 
 ### API Endpoints
 
-- `GET /health` - Health check endpoint
-- `GET /api/hello` - Test API endpoint
+- `GET /health`
 
-## Development
+## 開発
 
-### Backend (Go)
+### バックエンド実行方法（Go）
 
 ```bash
 cd backend
 go run main.go
 ```
 
-### Frontend (Next.js)
+### フロントエンド実行方法 (Next.js)
 
 ```bash
 cd frontend
@@ -57,16 +59,8 @@ npm install
 npm run dev
 ```
 
-## Stop the application
+## 文書情報
 
-```bash
-docker-compose down
-```
-
-## Environment Versions
-
-- Go: 1.25.2
-- Node.js: 24.9.0
-- npm: 11.6.0
-- Next.js: 15.1.6
-- Docker: 28.4.0
+**最終更新**:2025年10月24日
+**作成者**:平田陸翔
+**バージョン**:v1.0.1
