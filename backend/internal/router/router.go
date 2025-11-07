@@ -5,6 +5,8 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 
 	"zerodelay/internal/handler"
+	custommiddleware "zerodelay/internal/middleware"
+	"zerodelay/internal/service"
 )
 
 // SetupRoutes configures all application routes
@@ -13,6 +15,8 @@ func SetupRoutes(
 	healthHandler *handler.HealthHandler,
 	userHandler *handler.UserHandler,
 	placeHandler *handler.PlaceHandler,
+	authHandler *handler.AuthHandler,
+	authService *service.AuthService,
 ) {
 	// Middleware
 	e.Use(middleware.Logger())
@@ -22,8 +26,13 @@ func SetupRoutes(
 	// Health check
 	e.GET("/health", healthHandler.Health)
 
-	// API routes
+	// Auth routes
+	e.POST("/signup", authHandler.SignUp)
+	e.POST("/login", authHandler.Login)
+
+	// Protected API routes
 	api := e.Group("/api")
+	api.Use(custommiddleware.FirebaseAuthMiddleware(authService))
 
 	// User routes
 	users := api.Group("/users")
