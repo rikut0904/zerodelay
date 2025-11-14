@@ -13,6 +13,7 @@ func SetupRoutes(
 	healthHandler *handler.HealthHandler,
 	userHandler *handler.UserHandler,
 	placeHandler *handler.PlaceHandler,
+	mapHandler *handler.MapHandler,
 ) {
 	// Middleware
 	e.Use(middleware.Logger())
@@ -40,4 +41,9 @@ func SetupRoutes(
 	places.POST("", placeHandler.CreatePlace)
 	places.PUT("/:id", placeHandler.UpdatePlace)
 	places.DELETE("/:id", placeHandler.DeletePlace)
+
+	// Map routes
+	mapGroup := api.Group("/map")
+	mapGroup.GET("/places", mapHandler.GetMapPlaces)
+	mapGroup.POST("/places/bounds", mapHandler.GetPlacesInBounds)
 }

@@ -1,7 +1,10 @@
 package config
 
 import (
+	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 // Config holds all application configuration
@@ -22,6 +25,11 @@ type DatabaseConfig struct {
 
 // Load loads configuration from environment variables
 func Load() *Config {
+	// Load .env file if it exists
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, using environment variables")
+	}
+
 	return &Config{
 		Server: ServerConfig{
 			Port: getEnv("PORT", "8080"),
