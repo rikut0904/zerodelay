@@ -1,0 +1,24 @@
+{
+  "name": "ZeroDelay Dev Environment",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "backend",
+  "workspaceFolder": "/workspace",
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "golang.go",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  
+  "forwardPorts": [8080, 3000],
+  "postCreateCommand": "echo 'Dev Container Ready!'",
+  
+  "remoteUser": "root"
+}
