@@ -1,77 +1,103 @@
-"use client"; // ← これが必要！
+"use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Menu } from "lucide-react";
 
 export default function Home() {
-  // ⚠️ 警報テキストを状態管理
   const [alertText, setAlertText] = useState("警報情報を取得中...");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false); // ← 追加：スマホ判定用
 
-  // ⏳ 5分ごとに気象庁API（石川県）から情報取得
+  // 📱 画面幅によってスマホかどうか判定
+  useEffect(() => {
+    const checkWidth = () => setIsMobile(window.innerWidth < 768);
+    checkWidth();
+    window.addEventListener("resize", checkWidth);
+    return () => window.removeEventListener("resize", checkWidth);
+  }, []);
+
+  // ⚠️ 警報データを取得
   useEffect(() => {
     const fetchAlert = async () => {
       try {
         const res = await fetch("/api/alert", { cache: "no-store" });
         const data = await res.json();
-
         if (!data.hasAny) {
           setAlertText("✅ 石川県に警報・注意報は発令されていません");
           return;
         }
-
         const parts: string[] = [];
         if (data.buckets.special.length) parts.push("🟣特別警報");
         if (data.buckets.warning.length) parts.push("🔴警報");
         if (data.buckets.advisory.length) parts.push("🟡注意報");
-
         setAlertText(`⚠️ 石川県の発表状況：${parts.join("・")}`);
       } catch {
         setAlertText("⚠️ 警報情報の取得に失敗しました");
       }
     };
-
-    fetchAlert(); // 初回実行
-    const timer = setInterval(fetchAlert, 5 * 60 * 1000); // 5分ごと
+    fetchAlert();
+    const timer = setInterval(fetchAlert, 5 * 60 * 1000);
     return () => clearInterval(timer);
   }, []);
 
   return (
     <div style={styles.container}>
-      {/* 🔍 検索バー */}
-      <div style={styles.searchBar}>
-        <input
-          type="text"
-          placeholder="住所・施設名を入力"
-          style={styles.searchInput}
-        />
+      {/* 🔍 検索バー＋メニューアイコン */}
+      <div style={styles.header}>
+        <div style={styles.searchBar}>
+          <input
+            type="text"
+            placeholder="住所・施設名を入力"
+            style={styles.searchInput}
+          />
+        </div>
+
+        {/* スマホ時だけ三本線を表示 */}
+        {isMobile && (
+          <div
+            style={styles.menuIcon}
+            onClick={() => setMenuOpen((prev) => !prev)}
+          >
+            <Menu size={28} />
+          </div>
+        )}
       </div>
 
-      {/* 🌊 災害ボタン */}
+      {/* スマホ時：ハンバーガーメニュー */}
+      {menuOpen && isMobile && (
+        <div style={styles.drawer}>
+          <Link href="/" style={styles.drawerItem}>🏠 ホーム</Link>
+          <Link href="/info" style={styles.drawerItem}>📡 情報</Link>
+          <Link href="/setting" style={styles.drawerItem}>⚙️ 設定</Link>
+        </div>
+      )}
+
+      {/* 災害ボタン */}
       <div style={styles.buttons}>
         <button style={styles.button}>洪水</button>
-        <button style={styles.button}>土砂</button>
         <button style={styles.button}>津波</button>
         <button style={styles.button}>地震</button>
       </div>
 
-      {/* 🗺️ 地図エリア */}
+      {/* 地図エリア */}
       <div style={styles.mapArea}>🗺️ 地図エリア（現在地＋避難所）</div>
 
-      {/* ⚠️ 警報表示 */}
-      <div style={styles.alert}>{alertText}</div>
-
-      {/* 🧭 ナビゲーション */}
-      <div style={styles.nav}>
-        <span>🏠 ホーム</span>
-        <span>📡 情報</span>
-        <a href="/setting" style={styles.link}>
-          ⚙️ 設定
-        </a>
-      </div>
+      {/* PC時のみナビ表示 */}
+      {!isMobile && (
+        <div style={styles.nav}>
+          <span>🏠 ホーム</span>
+          <span>📡 情報</span>
+          <Link href="/setting" style={styles.link}>
+            ⚙️ 設定
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
 
-// 💅 スタイル設定（レスポンシブ対応済み）
+// 🎨 スタイル
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
     fontFamily: "sans-serif",
@@ -81,16 +107,44 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
-    fontSize: "var(--app-font-size)", // ←画面幅で文字サイズ変化
+    fontSize: "var(--app-font-size)",
+  },
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: "8px 12px",
+    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
   },
   searchBar: {
-    padding: "10px",
-    backgroundColor: "#fff",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+    flex: 1,
   },
   searchInput: {
     width: "80%",
     padding: "8px",
+    fontSize: "var(--app-font-size)",
+  },
+  menuIcon: {
+    cursor: "pointer",
+  },
+  drawer: {
+    position: "absolute",
+    top: 60,
+    right: 10,
+    backgroundColor: "#fff",
+    boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+    borderRadius: "8px",
+    display: "flex",
+    flexDirection: "column",
+    zIndex: 1000,
+  },
+  drawerItem: {
+    padding: "12px 20px",
+    textAlign: "left",
+    borderBottom: "1px solid #eee",
+    color: "#333",
+    textDecoration: "none",
     fontSize: "var(--app-font-size)",
   },
   buttons: {
