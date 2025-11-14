@@ -34,17 +34,19 @@ func main() {
 	// Initialize services
 	userService := service.NewUserService(userRepo)
 	placeService := service.NewPlaceService(placeRepo)
+	mapService := service.NewMapService(placeRepo)
 
 	// Initialize handlers
 	healthHandler := handler.NewHealthHandler()
 	userHandler := handler.NewUserHandler(userService)
 	placeHandler := handler.NewPlaceHandler(placeService)
+	mapHandler := handler.NewMapHandler(mapService)
 
 	// Initialize Echo
 	e := echo.New()
 
 	// Setup routes
-	router.SetupRoutes(e, healthHandler, userHandler, placeHandler)
+	router.SetupRoutes(e, healthHandler, userHandler, placeHandler, mapHandler)
 
 	// Start server
 	port := fmt.Sprintf(":%s", cfg.Server.Port)
