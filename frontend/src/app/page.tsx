@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
+import MapView from "@/components/MapView";
+
 
 export default function Home() {
   const [alertText, setAlertText] = useState("警報情報を取得中...");
@@ -15,30 +17,6 @@ export default function Home() {
     checkWidth();
     window.addEventListener("resize", checkWidth);
     return () => window.removeEventListener("resize", checkWidth);
-  }, []);
-
-  // ⚠️ 警報データを取得
-  useEffect(() => {
-    const fetchAlert = async () => {
-      try {
-        const res = await fetch("/api/alert", { cache: "no-store" });
-        const data = await res.json();
-        if (!data.hasAny) {
-          setAlertText("✅ 石川県に警報・注意報は発令されていません");
-          return;
-        }
-        const parts: string[] = [];
-        if (data.buckets.special.length) parts.push("🟣特別警報");
-        if (data.buckets.warning.length) parts.push("🔴警報");
-        if (data.buckets.advisory.length) parts.push("🟡注意報");
-        setAlertText(`⚠️ 石川県の発表状況：${parts.join("・")}`);
-      } catch {
-        setAlertText("⚠️ 警報情報の取得に失敗しました");
-      }
-    };
-    fetchAlert();
-    const timer = setInterval(fetchAlert, 5 * 60 * 1000);
-    return () => clearInterval(timer);
   }, []);
 
   return (
@@ -81,8 +59,9 @@ export default function Home() {
       </div>
 
       {/* 地図エリア */}
-      <div style={styles.mapArea}>🗺️ 地図エリア（現在地＋避難所）</div>
-
+      <div style={styles.mapArea}>
+        <MapView />
+      </div>
       {/* PC時のみナビ表示 */}
       {!isMobile && (
         <div style={styles.nav}>
@@ -163,12 +142,12 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   mapArea: {
     flex: 1,
-    backgroundColor: "#d9e6ff",
+    height: "100%",
+    width: "100%",
     display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "var(--app-font-size)",
+    position: "relative",
   },
+
   alert: {
     backgroundColor: "#ffeb3b",
     padding: "10px",
