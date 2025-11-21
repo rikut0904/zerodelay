@@ -99,13 +99,15 @@ func (r *authRepository) SignUp(ctx context.Context, req *model.SignUpRequest) (
 		"returnSecureToken": "true",
 	}
 
-	log.Printf("[INFO] Attempting to sign up user: %s", req.Email)
+	log.Printf("[DEBUG] Attempting to sign up user: %s", req.Email)
 	resp, err := r.callFirebaseAuthAPI(ctx, signUpEndpoint, payload)
 	if err != nil {
+		log.Println("[INFO] Sign up failed")
 		return nil, err
 	}
 
-	log.Printf("[INFO] Successfully signed up user: %s", req.Email)
+	log.Println("[INFO] Sign up successful")
+	log.Printf("[DEBUG] Signed up user: %s", req.Email)
 	return resp, nil
 }
 
@@ -116,29 +118,16 @@ func (r *authRepository) Login(ctx context.Context, req *model.LoginRequest) (*m
 		"returnSecureToken": "true",
 	}
 
-	log.Printf("[INFO] Attempting to login user: %s", req.Email)
+	log.Printf("[DEBUG] Attempting to login user: %s", req.Email)
 	resp, err := r.callFirebaseAuthAPI(ctx, signInEndpoint, payload)
 	if err != nil {
-		return nil, fmt.Errorf("failed to communicate with Firebase: %w", err)
-	}
-	defer resp.Body.Close()
-
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %w", err)
-	}
-	if resp.StatusCode != http.StatusOK {
-		var fbErr model.FirebaseError
-		_ = json.Unmarshal(respBody, &fbErr)
-		return nil, fmt.Errorf("firebase error: %s", fbErr.Error.Message)
+		log.Println("[INFO] Login failed")
+		return nil, err
 	}
 
-	var authResp model.AuthResponse
-	if err := json.Unmarshal(respBody, &authResp); err != nil {
-		return nil, fmt.Errorf("failed to parse response: %w", err)
-	}
-
-	return &authResp, nil
+	log.Println("[INFO] Login successful")
+	log.Printf("[DEBUG] Logged in user: %s", req.Email)
+	return resp, nil
 }
 
 func (r *authRepository) VerifyIDToken(ctx context.Context, idToken string) (string, error) {
@@ -147,6 +136,7 @@ func (r *authRepository) VerifyIDToken(ctx context.Context, idToken string) (str
 		log.Printf("[ERROR] Failed to verify ID token: %v", err)
 		return "", fmt.Errorf("invalid or expired ID token: %w", err)
 	}
-	log.Printf("[INFO] Successfully verified token for UID: %s", token.UID)
+	log.Println("[INFO] Token verification successful")
+	log.Printf("[DEBUG] Verified token for UID: %s", token.UID)
 	return token.UID, nil
 }
