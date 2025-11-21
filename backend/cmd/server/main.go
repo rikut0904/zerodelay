@@ -19,7 +19,10 @@ func main() {
 	cfg := config.Load()
 
 	// Initialize Firebase
-	firebaseAuth := config.InitFirebase()
+	firebaseAuth, err := config.InitFirebase()
+	if err != nil {
+		log.Fatalf("Failed to initialize Firebase: %v", err)
+	}
 
 	// Initialize database
 	db, err := database.NewDatabase(cfg)
