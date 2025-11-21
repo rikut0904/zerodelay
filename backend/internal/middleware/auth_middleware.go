@@ -33,7 +33,8 @@ log.Printf("[WARN] Token verification failed for request: %s %s - %v", c.Request
 return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Invalid or expired ID token"})
 }
 
-log.Printf("[INFO] Authenticated user %s for request: %s %s", uid, c.Request().Method, c.Request().URL.Path)
+log.Printf("[INFO] Authentication successful for request: %s %s", c.Request().Method, c.Request().URL.Path)
+log.Printf("[DEBUG] Authenticated user %s for request: %s %s", uid, c.Request().Method, c.Request().URL.Path)
 c.Set("uid", uid)
 return next(c)
 }
