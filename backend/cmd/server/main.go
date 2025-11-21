@@ -18,6 +18,12 @@ func main() {
 	// Load configuration
 	cfg := config.Load()
 
+	// Initialize Firebase
+	firebaseAuth, err := config.InitFirebase()
+	if err != nil {
+		log.Fatalf("Failed to initialize Firebase: %v", err)
+	}
+
 	// Initialize database
 	db, err := database.NewDatabase(cfg)
 	if err != nil {
@@ -30,21 +36,24 @@ func main() {
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(db.DB)
 	placeRepo := repository.NewPlaceRepository(db.DB)
+	authRepo := repository.NewAuthRepository(firebaseAuth)
 
 	// Initialize services
 	userService := service.NewUserService(userRepo)
 	placeService := service.NewPlaceService(placeRepo)
+	authService := service.NewAuthService(authRepo)
 
 	// Initialize handlers
 	healthHandler := handler.NewHealthHandler()
 	userHandler := handler.NewUserHandler(userService)
 	placeHandler := handler.NewPlaceHandler(placeService)
+	authHandler := handler.NewAuthHandler(authService)
 
 	// Initialize Echo
 	e := echo.New()
 
 	// Setup routes
-	router.SetupRoutes(e, healthHandler, userHandler, placeHandler)
+	router.SetupRoutes(e, healthHandler, userHandler, placeHandler, authHandler, authService)
 
 	// Start server
 	port := fmt.Sprintf(":%s", cfg.Server.Port)
