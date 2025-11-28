@@ -17,9 +17,10 @@ import (
 )
 
 const (
-	firebaseAuthBaseURL = "https://identitytoolkit.googleapis.com/v1"
-	signUpEndpoint      = "/accounts:signUp"
-	signInEndpoint      = "/accounts:signInWithPassword"
+	firebaseAuthBaseURL       = "https://identitytoolkit.googleapis.com/v1"
+	signUpEndpoint            = "/accounts:signUp"
+	signInEndpoint            = "/accounts:signInWithPassword"
+	sendVerificationEndpoint  = "/accounts:sendOobCode"
 )
 
 type authRepository struct {
@@ -150,4 +151,51 @@ func (r *authRepository) UpdateEmail(ctx context.Context, uid string, newEmail s
 	}
 	log.Printf("[INFO] Email updated successfully in Firebase for UID: %s", uid)
 	return nil
+}
+
+func (r *authRepository) SendEmailVerification(ctx context.Context, idToken string) error {
+	payload := map[string]string{
+		"requestType": "VERIFY_EMAIL",
+		"idToken":     idToken,
+	}
+
+	body, err := json.Marshal(payload)
+	if err != nil {
+		log.Printf("[ERROR] Failed to marshal email verification request: %v", err)
+		return fmt.Errorf("failed to marshal request payload: %w", err)
+	}
+
+	url := fmt.Sprintf("%s%s?key=%s", r.baseURL, sendVerificationEndpoint, r.apiKey)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(body))
+	if err != nil {
+		log.Printf("[ERROR] Failed to create HTTP request: %v", err)
+		return fmt.Errorf("failed to create HTTP request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf("[ERROR] Failed to send email verification: %v", err)
+		return fmt.Errorf("failed to send email verification: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		respBody, _ := io.ReadAll(resp.Body)
+		log.Printf("[ERROR] Email verification failed with status %d: %s", resp.StatusCode, string(respBody))
+		return fmt.Errorf("failed to send email verification: status %d", resp.StatusCode)
+	}
+
+	log.Println("[INFO] Email verification sent successfully")
+	return nil
+}
+
+func (r *authRepository) GetUser(ctx context.Context, uid string) (*fbauth.UserRecord, error) {
+	user, err := r.firebaseAuth.GetUser(ctx, uid)
+	if err != nil {
+		log.Printf("[ERROR] Failed to get user from Firebase: %v", err)
+		return nil, fmt.Errorf("failed to get user: %w", err)
+	}
+	return user, nil
 }

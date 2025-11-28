@@ -27,7 +27,13 @@ func (s *AuthService) SignUp(ctx context.Context, req *model.SignUpRequest) (*mo
 		return nil, err
 	}
 
-	// 2. PostgreSQL にユーザー情報を保存
+	// 2. メール確認リンクを送信
+	if err := s.authRepo.SendEmailVerification(ctx, authResp.IDToken); err != nil {
+		// メール送信失敗してもユーザー作成は続行
+		// エラーログは既にRepository層で出力済み
+	}
+
+	// 3. PostgreSQL にユーザー情報を保存
 	user := &model.User{
 		FirebaseUID: authResp.LocalID,
 		Email:       authResp.Email,
@@ -40,7 +46,7 @@ func (s *AuthService) SignUp(ctx context.Context, req *model.SignUpRequest) (*mo
 		return nil, errors.New("failed to create user in database: " + err.Error())
 	}
 
-	// 3. レスポンスにユーザー情報を追加
+	// 4. レスポンスにユーザー情報を追加
 	authResp.User = user
 
 	return authResp, nil
@@ -53,20 +59,38 @@ func (s *AuthService) Login(ctx context.Context, req *model.LoginRequest) (*mode
 		return nil, err
 	}
 
-	// 2. PostgreSQL からユーザー情報を取得
-	user, err := s.userRepo.FindByFirebaseUID(authResp.LocalID)
+	// 2. メールアドレスが確認済みかチェック
+	user, err := s.authRepo.GetUser(ctx, authResp.LocalID)
+	if err != nil {
+		return nil, errors.New("failed to get user information")
+	}
+
+	if !user.EmailVerified {
+		return nil, errors.New("email not verified. Please check your email and verify your account")
+	}
+
+	// 3. PostgreSQL からユーザー情報を取得
+	dbUser, err := s.userRepo.FindByFirebaseUID(authResp.LocalID)
 	if err != nil {
 		// ユーザーが見つからない場合は警告ログを出して続行
 		// （Firebase認証は成功しているため）
 		return authResp, nil
 	}
 
-	// 3. レスポンスにユーザー情報を追加
-	authResp.User = user
+	// 4. レスポンスにユーザー情報を追加
+	authResp.User = dbUser
 
 	return authResp, nil
 }
 
 func (s *AuthService) VerifyIDToken(ctx context.Context, idToken string) (string, error) {
 	return s.authRepo.VerifyIDToken(ctx, idToken)
+}
+
+func (s *AuthService) IsEmailVerified(ctx context.Context, uid string) (bool, error) {
+	user, err := s.authRepo.GetUser(ctx, uid)
+	if err != nil {
+		return false, err
+	}
+	return user.EmailVerified, nil
 }
