@@ -33,6 +33,12 @@ func main() {
 
 	log.Println("Connected to database successfully")
 
+	// Run auto migration
+	if err := db.AutoMigrate(); err != nil {
+		log.Fatalf("Failed to run auto migration: %v", err)
+	}
+	log.Println("Auto migration completed successfully")
+
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(db.DB)
 	placeRepo := repository.NewPlaceRepository(db.DB)
