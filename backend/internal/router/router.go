@@ -47,6 +47,7 @@ func SetupRoutes(
 	users.POST("", userHandler.CreateUser)
 	users.PUT("/:id", userHandler.UpdateUser)
 	users.DELETE("/:id", userHandler.DeleteUser)
+	users.PATCH("/me", userHandler.UpdateProfile) // プロフィール更新（自分自身）
 
 	// Place routes
 	places := v1.Group("/places")

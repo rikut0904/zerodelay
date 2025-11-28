@@ -140,3 +140,14 @@ func (r *authRepository) VerifyIDToken(ctx context.Context, idToken string) (str
 	log.Printf("[DEBUG] Verified token for UID: %s", token.UID)
 	return token.UID, nil
 }
+
+func (r *authRepository) UpdateEmail(ctx context.Context, uid string, newEmail string) error {
+	params := (&fbauth.UserToUpdate{}).Email(newEmail)
+	_, err := r.firebaseAuth.UpdateUser(ctx, uid, params)
+	if err != nil {
+		log.Printf("[ERROR] Failed to update email in Firebase: %v", err)
+		return fmt.Errorf("failed to update email in Firebase: %w", err)
+	}
+	log.Printf("[INFO] Email updated successfully in Firebase for UID: %s", uid)
+	return nil
+}

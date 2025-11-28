@@ -22,6 +22,16 @@ func (User) TableName() string {
 	return "users"
 }
 
+// UpdateProfileRequest represents a profile update request
+type UpdateProfileRequest struct {
+	Name     *string `json:"name,omitempty"`
+	NameKana *string `json:"name_kana,omitempty"`
+	Old      *int    `json:"old,omitempty"`
+	Sex      *string `json:"sex,omitempty"`
+	Email    *string `json:"email,omitempty"`
+	Setting  JSON    `json:"setting,omitempty"`
+}
+
 // JSON is a custom type for handling JSON fields in GORM
 type JSON map[string]interface{}
 

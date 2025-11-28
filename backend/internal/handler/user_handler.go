@@ -92,3 +92,29 @@ func (h *UserHandler) DeleteUser(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "User deleted successfully"})
 }
+
+// UpdateProfile handles PATCH /api/v1/users/me
+func (h *UserHandler) UpdateProfile(c echo.Context) error {
+	// ミドルウェアでセットされたFirebaseUIDを取得
+	uid := c.Get("uid")
+	if uid == nil {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Unauthorized"})
+	}
+
+	firebaseUID, ok := uid.(string)
+	if !ok {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Invalid UID format"})
+	}
+
+	var req model.UpdateProfileRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
+	}
+
+	user, err := h.userService.UpdateProfile(c.Request().Context(), firebaseUID, &req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, user)
+}
