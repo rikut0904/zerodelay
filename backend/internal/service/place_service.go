@@ -41,9 +41,25 @@ func (s *PlaceService) GetAllPlaces() ([]model.Place, error) {
 }
 
 func (s *PlaceService) UpdatePlace(place *model.Place) error {
+	// Check if place exists
+	_, err := s.placeRepo.FindByID(place.ID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrPlaceNotFound
+		}
+		return err
+	}
 	return s.placeRepo.Update(place)
 }
 
 func (s *PlaceService) DeletePlace(id uint) error {
+	// Check if place exists
+	_, err := s.placeRepo.FindByID(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrPlaceNotFound
+		}
+		return err
+	}
 	return s.placeRepo.Delete(id)
 }
