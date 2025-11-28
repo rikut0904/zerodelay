@@ -44,3 +44,19 @@ func (h *AuthHandler) Login(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, resp)
 }
+
+func (h *AuthHandler) Logout(c echo.Context) error {
+	// Firebaseのログアウトはクライアント側でトークンを削除するだけで完結
+	// サーバー側ではログの記録や統計情報の更新などを行う
+
+	// 認証ミドルウェアで設定されたUIDを取得（オプション）
+	uid := c.Get("uid")
+	if uid != nil {
+		// ログ出力（必要に応じて）
+		// log.Printf("[INFO] User logged out: %s", uid)
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{
+		"message": "Logged out successfully",
+	})
+}

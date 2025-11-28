@@ -26,9 +26,14 @@ func SetupRoutes(
 	// Health check
 	e.GET("/health", healthHandler.Health)
 
-	// Auth routes
+	// Auth routes (public)
 	e.POST("/signup", authHandler.SignUp)
 	e.POST("/login", authHandler.Login)
+
+	// Protected auth routes (require authentication)
+	authRoutes := e.Group("/auth")
+	authRoutes.Use(custommiddleware.FirebaseAuthMiddleware(authService))
+	authRoutes.POST("/logout", authHandler.Logout)
 
 	// Protected API routes
 	api := e.Group("/api")

@@ -305,6 +305,32 @@ curl -X POST http://localhost:8080/login \
 - ✅ `user.old`が25になっている
 - ✅ `user.setting`にtheme情報が含まれている
 
+### Step 8: ログアウト
+
+認証済みユーザーのログアウト：
+
+```bash
+# Step 4で取得したidTokenを使用
+ID_TOKEN="eyJhbGciOiJSUzI1NiIsImtpZCI6IjM..."
+
+curl -X POST http://localhost:8080/auth/logout \
+  -H "Authorization: Bearer $ID_TOKEN"
+```
+
+**期待されるレスポンス:**
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+**確認ポイント:**
+- ✅ 200 OKが返される
+- ✅ メッセージが表示される
+- ✅ **クライアント側でトークンを削除する必要がある**（サーバーはステートレス）
+
+**重要:** サーバー側のログアウトは成功を返すだけです。実際のトークン削除はクライアント側（フロントエンド）で行います。
+
 ## エラーケースの確認
 
 ### 1. 重複メールアドレスでのSignUp
@@ -378,6 +404,7 @@ curl -X GET http://localhost:8080/api/users \
 - [ ] IDTokenで保護されたAPIにアクセスできる
 - [ ] ユーザー情報の更新ができる（PostgreSQLのみ）
 - [ ] 更新後のLoginで最新情報が返される
+- [ ] **Logoutが成功する（認証必須）**
 - [ ] 重複メールアドレスでSignUpがエラーになる
 - [ ] 間違ったパスワードでLoginがエラーになる
 - [ ] 無効なトークンでAPIアクセスがエラーになる

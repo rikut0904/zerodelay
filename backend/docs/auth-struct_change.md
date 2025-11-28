@@ -159,6 +159,11 @@ Handler → AuthService → AuthRepository (Firebase)
   - レスポンスにPostgreSQLユーザー情報を含む
 - `GET /health` - ヘルスチェック
 
+### 認証が必要なエンドポイント
+- `POST /auth/logout` - **ログアウト**（認証必須）
+  - サーバー側でログアウト成功を返す
+  - 実際のトークン削除はクライアント側で実施
+
 ### 保護されたエンドポイント (認証必須)
 - `GET /api/users` - ユーザー一覧取得
 - `POST /api/users` - ユーザー作成
