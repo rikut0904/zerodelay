@@ -4,6 +4,10 @@ import (
 	"fmt"
 	"log"
 
+<<<<<<< HEAD
+=======
+	"github.com/joho/godotenv"
+>>>>>>> 2f2f076d5aa2121f5be0bf3eebcd4472f3689601
 	"github.com/labstack/echo/v4"
 
 	"zerodelay/internal/config"
@@ -15,6 +19,14 @@ import (
 )
 
 func main() {
+<<<<<<< HEAD
+=======
+	// Load .env file
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, using environment variables")
+	}
+
+>>>>>>> 2f2f076d5aa2121f5be0bf3eebcd4472f3689601
 	// Load configuration
 	cfg := config.Load()
 
