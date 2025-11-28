@@ -17,7 +17,8 @@ type ServerConfig struct {
 
 // DatabaseConfig holds database connection configuration
 type DatabaseConfig struct {
-	URL string
+	URL      string
+	LogLevel string
 }
 
 // Load loads configuration from environment variables
@@ -27,7 +28,8 @@ func Load() *Config {
 			Port: getEnv("PORT", "8080"),
 		},
 		Database: DatabaseConfig{
-			URL: getEnv("DATABASE_URL", ""),
+			URL:      getEnv("DATABASE_URL", ""),
+			LogLevel: getEnv("DB_LOG_LEVEL", "warn"), // silent, error, warn, info
 		},
 	}
 }
