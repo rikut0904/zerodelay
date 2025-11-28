@@ -48,7 +48,7 @@ GET /health
 POST /api/v1/auth/signup
 ```
 
-**説明:** 新規ユーザーを作成（Firebase + PostgreSQL）
+**説明:** 新規ユーザーを作成（Firebase + PostgreSQL）し、確認メールを送信
 
 **リクエスト:**
 ```json
@@ -78,6 +78,11 @@ POST /api/v1/auth/signup
   }
 }
 ```
+
+**重要:**
+- サインアップ後、登録したメールアドレスに確認メールが送信されます
+- メールアドレス確認が完了するまで、ログインや他のAPIの利用はできません
+- 確認メール内のリンクをクリックして、メールアドレスを確認してください
 
 ---
 
@@ -118,6 +123,17 @@ POST /api/v1/auth/login
 }
 ```
 
+**エラー（メール未確認）:**
+```json
+{
+  "error": "email not verified. Please check your email and verify your account"
+}
+```
+
+**重要:**
+- ログインには**メールアドレスの確認が必須**です
+- サインアップ後に送信された確認メール内のリンクをクリックしてください
+
 ---
 
 ## 🔐 認証が必要なエンドポイント
@@ -126,6 +142,17 @@ POST /api/v1/auth/login
 
 ```
 Authorization: Bearer <idToken>
+```
+
+**重要:**
+- 全ての認証が必要なエンドポイントでは**メールアドレスの確認が必須**です
+- メール未確認の場合は403エラーが返されます
+
+**エラー（メール未確認）:**
+```json
+{
+  "error": "Email not verified. Please verify your email address"
+}
 ```
 
 ---
@@ -618,6 +645,7 @@ Authorization: Bearer <idToken>
 | 200 | 成功 |
 | 400 | リクエストエラー（バリデーション失敗など） |
 | 401 | 認証エラー（トークン無効・期限切れ） |
+| 403 | 権限エラー（メールアドレス未確認など） |
 | 404 | リソースが見つからない |
 | 500 | サーバーエラー |
 

@@ -33,6 +33,18 @@ log.Printf("[WARN] Token verification failed for request: %s %s - %v", c.Request
 return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Invalid or expired ID token"})
 }
 
+// メールアドレス確認済みかチェック
+emailVerified, err := authService.IsEmailVerified(c.Request().Context(), uid)
+if err != nil {
+log.Printf("[ERROR] Failed to check email verification status for %s: %v", uid, err)
+return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to verify email status"})
+}
+
+if !emailVerified {
+log.Printf("[WARN] Email not verified for user %s", uid)
+return c.JSON(http.StatusForbidden, map[string]string{"error": "Email not verified. Please verify your email address"})
+}
+
 log.Printf("[INFO] Authentication successful for request: %s %s", c.Request().Method, c.Request().URL.Path)
 log.Printf("[DEBUG] Authenticated user %s for request: %s %s", uid, c.Request().Method, c.Request().URL.Path)
 c.Set("uid", uid)
