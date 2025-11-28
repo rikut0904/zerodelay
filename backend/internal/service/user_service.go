@@ -1,16 +1,11 @@
 package service
 
 import (
-<<<<<<< HEAD
+	"context"
 	"errors"
 
 	"gorm.io/gorm"
 
-=======
-	"context"
-	"errors"
-
->>>>>>> b9d2685 (feat: プロフィール更新API（PATCH /api/v1/users/me）を追加)
 	"zerodelay/internal/domain/model"
 	"zerodelay/internal/domain/repository"
 )
