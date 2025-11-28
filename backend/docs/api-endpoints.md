@@ -322,6 +322,67 @@ Authorization: Bearer <idToken>
 
 ---
 
+### プロフィール更新（自分自身）
+```
+PATCH /api/v1/users/me
+```
+
+**説明:** ログインユーザー自身のプロフィールを部分更新
+
+**リクエストヘッダー:**
+```
+Authorization: Bearer <idToken>
+```
+
+**リクエストボディ:**（更新したいフィールドのみ送信）
+```json
+{
+  "name": "山田太郎（更新）",
+  "old": 26
+}
+```
+
+**全フィールド例:**
+```json
+{
+  "name": "山田太郎",
+  "name_kana": "やまだたろう",
+  "old": 26,
+  "sex": "male",
+  "email": "newemail@example.com",
+  "setting": {"theme": "dark", "notifications": true}
+}
+```
+
+**レスポンス:**
+```json
+{
+  "id": 1,
+  "firebase_uid": "abc123",
+  "email": "newemail@example.com",
+  "name": "山田太郎（更新）",
+  "name_kana": "やまだたろう",
+  "old": 26,
+  "sex": "male",
+  "setting": {"theme": "dark", "notifications": true}
+}
+```
+
+**特徴:**
+- **部分更新可能** - 変更したいフィールドのみ送信
+- **Email変更時はFirebaseも同期** - Firebase側のメールアドレスも自動更新
+- **Settingはマージ** - 既存設定と新規設定を結合（上書きではない）
+- **トークンから自動識別** - `:id`不要、ログインユーザーを自動特定
+
+**エラー（401）:**
+```json
+{
+  "error": "Unauthorized"
+}
+```
+
+---
+
 ### ユーザー削除
 ```
 DELETE /api/v1/users/:id
@@ -539,7 +600,8 @@ Authorization: Bearer <idToken>
 | GET | `/api/v1/users` | 必要 | 全ユーザー取得 |
 | GET | `/api/v1/users/:id` | 必要 | 特定ユーザー取得 |
 | POST | `/api/v1/users` | 必要 | ユーザー作成 |
-| PUT | `/api/v1/users/:id` | 必要 | ユーザー更新 |
+| PUT | `/api/v1/users/:id` | 必要 | ユーザー更新（全フィールド） |
+| PATCH | `/api/v1/users/me` | 必要 | **プロフィール更新（部分更新）** |
 | DELETE | `/api/v1/users/:id` | 必要 | ユーザー削除 |
 | GET | `/api/v1/places` | 必要 | 全場所取得 |
 | GET | `/api/v1/places/:id` | 必要 | 特定場所取得 |

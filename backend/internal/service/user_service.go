@@ -1,10 +1,16 @@
 package service
 
 import (
+<<<<<<< HEAD
 	"errors"
 
 	"gorm.io/gorm"
 
+=======
+	"context"
+	"errors"
+
+>>>>>>> b9d2685 (feat: プロフィール更新API（PATCH /api/v1/users/me）を追加)
 	"zerodelay/internal/domain/model"
 	"zerodelay/internal/domain/repository"
 )
@@ -14,11 +20,15 @@ var ErrUserNotFound = errors.New("user not found")
 // UserService handles business logic for users
 type UserService struct {
 	userRepo repository.UserRepository
+	authRepo repository.AuthRepository
 }
 
 // NewUserService creates a new user service
-func NewUserService(userRepo repository.UserRepository) *UserService {
-	return &UserService{userRepo: userRepo}
+func NewUserService(userRepo repository.UserRepository, authRepo repository.AuthRepository) *UserService {
+	return &UserService{
+		userRepo: userRepo,
+		authRepo: authRepo,
+	}
 }
 
 func (s *UserService) CreateUser(user *model.User) error {
@@ -62,4 +72,53 @@ func (s *UserService) DeleteUser(id uint) error {
 		return err
 	}
 	return s.userRepo.Delete(id)
+}
+
+func (s *UserService) UpdateProfile(ctx context.Context, firebaseUID string, req *model.UpdateProfileRequest) (*model.User, error) {
+	// 1. FirebaseUIDでユーザーを取得
+	user, err := s.userRepo.FindByFirebaseUID(firebaseUID)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	// 2. 部分更新：送信されたフィールドのみ更新
+	if req.Name != nil {
+		user.Name = *req.Name
+	}
+	if req.NameKana != nil {
+		user.NameKana = *req.NameKana
+	}
+	if req.Old != nil {
+		user.Old = *req.Old
+	}
+	if req.Sex != nil {
+		user.Sex = *req.Sex
+	}
+
+	// 3. Email更新時はFirebaseも同期
+	if req.Email != nil && *req.Email != user.Email {
+		if err := s.authRepo.UpdateEmail(ctx, firebaseUID, *req.Email); err != nil {
+			return nil, errors.New("failed to update email in Firebase: " + err.Error())
+		}
+		user.Email = *req.Email
+	}
+
+	// 4. Setting更新時はマージ
+	if req.Setting != nil {
+		if user.Setting == nil {
+			user.Setting = req.Setting
+		} else {
+			// 既存Settingと新規Settingをマージ
+			for key, value := range req.Setting {
+				user.Setting[key] = value
+			}
+		}
+	}
+
+	// 5. PostgreSQLに保存
+	if err := s.userRepo.Update(user); err != nil {
+		return nil, errors.New("failed to update user: " + err.Error())
+	}
+
+	return user, nil
 }

@@ -49,7 +49,7 @@ func main() {
 	authRepo := repository.NewAuthRepository(firebaseAuth)
 
 	// Initialize services
-	userService := service.NewUserService(userRepo)
+	userService := service.NewUserService(userRepo, authRepo)
 	placeService := service.NewPlaceService(placeRepo)
 	authService := service.NewAuthService(authRepo, userRepo)
 
