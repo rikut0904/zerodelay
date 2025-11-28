@@ -40,11 +40,31 @@ func (s *AuthService) SignUp(ctx context.Context, req *model.SignUpRequest) (*mo
 		return nil, errors.New("failed to create user in database: " + err.Error())
 	}
 
+	// 3. レスポンスにユーザー情報を追加
+	authResp.User = user
+
 	return authResp, nil
 }
 
 func (s *AuthService) Login(ctx context.Context, req *model.LoginRequest) (*model.AuthResponse, error) {
-	return s.authRepo.Login(ctx, req)
+	// 1. Firebase で認証
+	authResp, err := s.authRepo.Login(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	// 2. PostgreSQL からユーザー情報を取得
+	user, err := s.userRepo.FindByFirebaseUID(authResp.LocalID)
+	if err != nil {
+		// ユーザーが見つからない場合は警告ログを出して続行
+		// （Firebase認証は成功しているため）
+		return authResp, nil
+	}
+
+	// 3. レスポンスにユーザー情報を追加
+	authResp.User = user
+
+	return authResp, nil
 }
 
 func (s *AuthService) VerifyIDToken(ctx context.Context, idToken string) (string, error) {

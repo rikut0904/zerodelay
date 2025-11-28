@@ -17,6 +17,7 @@ type AuthResponse struct {
 	ExpiresIn    string `json:"expiresIn"`
 	LocalID      string `json:"localId"`
 	Registered   bool   `json:"registered,omitempty"`
+	User         *User  `json:"user,omitempty"` // PostgreSQLから取得したユーザー情報
 }
 
 type FirebaseError struct {
