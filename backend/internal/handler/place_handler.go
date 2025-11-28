@@ -1,6 +1,10 @@
 package handler
 
 import (
+<<<<<<< HEAD
+=======
+	"errors"
+>>>>>>> 2f2f076d5aa2121f5be0bf3eebcd4472f3689601
 	"net/http"
 	"strconv"
 
@@ -43,7 +47,14 @@ func (h *PlaceHandler) GetPlace(c echo.Context) error {
 
 	place, err := h.placeService.GetPlace(uint(id))
 	if err != nil {
+<<<<<<< HEAD
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Place not found"})
+=======
+		if errors.Is(err, service.ErrPlaceNotFound) {
+			return c.JSON(http.StatusNotFound, map[string]string{"error": "Place not found"})
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+>>>>>>> 2f2f076d5aa2121f5be0bf3eebcd4472f3689601
 	}
 
 	return c.JSON(http.StatusOK, place)
