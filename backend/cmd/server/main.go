@@ -47,7 +47,7 @@ func main() {
 	// Initialize services
 	userService := service.NewUserService(userRepo)
 	placeService := service.NewPlaceService(placeRepo)
-	authService := service.NewAuthService(authRepo)
+	authService := service.NewAuthService(authRepo, userRepo)
 
 	// Initialize handlers
 	healthHandler := handler.NewHealthHandler()
