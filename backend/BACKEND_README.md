@@ -486,10 +486,6 @@ func (db *DB) AutoMigrate() error {
 }
 ```
 
-### main.go で呼ぶ（起動時にテーブル作成/更新）
-
-本番では別ツール（migrate コマンド等）を使うが、開発時は AutoMigrate で十分。
-
 ---
 
 ## 10. ルーティングの集約

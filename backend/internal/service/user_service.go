@@ -1,9 +1,15 @@
 package service
 
 import (
+	"errors"
+
+	"gorm.io/gorm"
+
 	"zerodelay/internal/domain/model"
 	"zerodelay/internal/domain/repository"
 )
+
+var ErrUserNotFound = errors.New("user not found")
 
 // UserService handles business logic for users
 type UserService struct {
@@ -20,7 +26,14 @@ func (s *UserService) CreateUser(user *model.User) error {
 }
 
 func (s *UserService) GetUser(id uint) (*model.User, error) {
-	return s.userRepo.FindByID(id)
+	user, err := s.userRepo.FindByID(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrUserNotFound
+		}
+		return nil, err
+	}
+	return user, nil
 }
 
 func (s *UserService) GetAllUsers() ([]model.User, error) {
@@ -28,9 +41,25 @@ func (s *UserService) GetAllUsers() ([]model.User, error) {
 }
 
 func (s *UserService) UpdateUser(user *model.User) error {
+	// Check if user exists
+	_, err := s.userRepo.FindByID(user.ID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrUserNotFound
+		}
+		return err
+	}
 	return s.userRepo.Update(user)
 }
 
 func (s *UserService) DeleteUser(id uint) error {
+	// Check if user exists
+	_, err := s.userRepo.FindByID(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrUserNotFound
+		}
+		return err
+	}
 	return s.userRepo.Delete(id)
 }
