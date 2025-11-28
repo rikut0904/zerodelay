@@ -1,9 +1,14 @@
 package service
 
 import (
+	"errors"
+
+	"gorm.io/gorm"
 	"zerodelay/internal/domain/model"
 	"zerodelay/internal/domain/repository"
 )
+
+var ErrPlaceNotFound = errors.New("place not found")
 
 // PlaceService handles business logic for places
 type PlaceService struct {
@@ -20,7 +25,14 @@ func (s *PlaceService) CreatePlace(place *model.Place) error {
 }
 
 func (s *PlaceService) GetPlace(id uint) (*model.Place, error) {
-	return s.placeRepo.FindByID(id)
+	place, err := s.placeRepo.FindByID(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrPlaceNotFound
+		}
+		return nil, err
+	}
+	return place, nil
 }
 
 func (s *PlaceService) GetAllPlaces() ([]model.Place, error) {
@@ -28,9 +40,25 @@ func (s *PlaceService) GetAllPlaces() ([]model.Place, error) {
 }
 
 func (s *PlaceService) UpdatePlace(place *model.Place) error {
+	// Check if place exists
+	_, err := s.placeRepo.FindByID(place.ID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrPlaceNotFound
+		}
+		return err
+	}
 	return s.placeRepo.Update(place)
 }
 
 func (s *PlaceService) DeletePlace(id uint) error {
+	// Check if place exists
+	_, err := s.placeRepo.FindByID(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrPlaceNotFound
+		}
+		return err
+	}
 	return s.placeRepo.Delete(id)
 }
