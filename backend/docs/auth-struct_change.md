@@ -150,28 +150,33 @@ Handler → AuthService → AuthRepository (Firebase)
 
 ## エンドポイント
 
-### 公開エンドポイント
-- `POST /signup` - ユーザー登録
+### 公開エンドポイント（認証不要）
+- `GET /health` - ヘルスチェック
+- `POST /api/v1/auth/signup` - ユーザー登録
   - **NEW**: PostgreSQLにもユーザー情報を保存
   - レスポンスにPostgreSQLユーザー情報を含む
-- `POST /login` - ログイン
+- `POST /api/v1/auth/login` - ログイン
   - **NEW**: PostgreSQLからユーザー情報を取得
   - レスポンスにPostgreSQLユーザー情報を含む
-- `GET /health` - ヘルスチェック
 
 ### 認証が必要なエンドポイント
-- `POST /auth/logout` - **ログアウト**（認証必須）
+- `POST /api/v1/auth/logout` - **ログアウト**（認証必須）
   - サーバー側でログアウト成功を返す
   - 実際のトークン削除はクライアント側で実施
 
-### 保護されたエンドポイント (認証必須)
-- `GET /api/users` - ユーザー一覧取得
-- `POST /api/users` - ユーザー作成
-- `GET /api/users/:id` - ユーザー取得
-- `PUT /api/users/:id` - **ユーザー更新** (PostgreSQLのみ更新)
-- `DELETE /api/users/:id` - ユーザー削除
-- `GET /api/places` - 場所一覧取得
-- その他すべての`/api/*`エンドポイント
+### 保護されたAPIエンドポイント（認証必須）
+- `GET /api/v1/users` - ユーザー一覧取得
+- `POST /api/v1/users` - ユーザー作成
+- `GET /api/v1/users/:id` - ユーザー取得
+- `PUT /api/v1/users/:id` - **ユーザー更新** (PostgreSQLのみ更新)
+- `DELETE /api/v1/users/:id` - ユーザー削除
+- `GET /api/v1/places` - 場所一覧取得
+- `GET /api/v1/places/:id` - 場所取得
+- `POST /api/v1/places` - 場所作成
+- `PUT /api/v1/places/:id` - 場所更新
+- `DELETE /api/v1/places/:id` - 場所削除
+
+**注意:** すべてのAPIエンドポイントは `/api/v1/` プレフィックスを使用します。
 
 ## データフロー
 

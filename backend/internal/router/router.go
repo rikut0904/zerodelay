@@ -23,24 +23,25 @@ func SetupRoutes(
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 
-	// Health check
+	// Health check (outside of API versioning)
 	e.GET("/health", healthHandler.Health)
 
+	// API v1
+	v1 := e.Group("/api/v1")
+
 	// Auth routes (public)
-	e.POST("/signup", authHandler.SignUp)
-	e.POST("/login", authHandler.Login)
+	auth := v1.Group("/auth")
+	auth.POST("/signup", authHandler.SignUp)
+	auth.POST("/login", authHandler.Login)
 
 	// Protected auth routes (require authentication)
-	authRoutes := e.Group("/auth")
-	authRoutes.Use(custommiddleware.FirebaseAuthMiddleware(authService))
-	authRoutes.POST("/logout", authHandler.Logout)
+	auth.POST("/logout", authHandler.Logout, custommiddleware.FirebaseAuthMiddleware(authService))
 
-	// Protected API routes
-	api := e.Group("/api")
-	api.Use(custommiddleware.FirebaseAuthMiddleware(authService))
+	// Protected API routes (require authentication)
+	v1.Use(custommiddleware.FirebaseAuthMiddleware(authService))
 
 	// User routes
-	users := api.Group("/users")
+	users := v1.Group("/users")
 	users.GET("", userHandler.GetAllUsers)
 	users.GET("/:id", userHandler.GetUser)
 	users.POST("", userHandler.CreateUser)
@@ -48,7 +49,7 @@ func SetupRoutes(
 	users.DELETE("/:id", userHandler.DeleteUser)
 
 	// Place routes
-	places := api.Group("/places")
+	places := v1.Group("/places")
 	places.GET("", placeHandler.GetAllPlaces)
 	places.GET("/:id", placeHandler.GetPlace)
 	places.POST("", placeHandler.CreatePlace)

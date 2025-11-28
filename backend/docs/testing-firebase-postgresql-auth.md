@@ -81,7 +81,7 @@ curl -X GET http://localhost:8080/health
 ### Step 2: ユーザー新規登録（SignUp）
 
 ```bash
-curl -X POST http://localhost:8080/signup \
+curl -X POST http://localhost:8080/api/v1/auth/signup \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
@@ -148,7 +148,7 @@ SELECT id, firebase_uid, email, name FROM users;
 同じ認証情報でログインできるか確認：
 
 ```bash
-curl -X POST http://localhost:8080/login \
+curl -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
@@ -200,7 +200,7 @@ curl -X POST http://localhost:8080/login \
 ID_TOKEN="eyJhbGciOiJSUzI1NiIsImtpZCI6IjM..."
 
 # 全ユーザー取得
-curl -X GET http://localhost:8080/api/users \
+curl -X GET http://localhost:8080/api/v1/users \
   -H "Authorization: Bearer $ID_TOKEN"
 ```
 
@@ -236,7 +236,7 @@ PostgreSQLのユーザー情報を更新：
 
 ```bash
 # ユーザー情報更新（ID=1のユーザー）
-curl -X PUT http://localhost:8080/api/users/1 \
+curl -X PUT http://localhost:8080/api/v1/users/1 \
   -H "Authorization: Bearer $ID_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -270,7 +270,7 @@ curl -X PUT http://localhost:8080/api/users/1 \
 再度ログインして、更新されたユーザー情報が返されるか確認：
 
 ```bash
-curl -X POST http://localhost:8080/login \
+curl -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
@@ -313,7 +313,7 @@ curl -X POST http://localhost:8080/login \
 # Step 4で取得したidTokenを使用
 ID_TOKEN="eyJhbGciOiJSUzI1NiIsImtpZCI6IjM..."
 
-curl -X POST http://localhost:8080/auth/logout \
+curl -X POST http://localhost:8080/api/v1/auth/logout \
   -H "Authorization: Bearer $ID_TOKEN"
 ```
 
@@ -337,7 +337,7 @@ curl -X POST http://localhost:8080/auth/logout \
 
 ```bash
 # 同じメールアドレスで再度SignUp
-curl -X POST http://localhost:8080/signup \
+curl -X POST http://localhost:8080/api/v1/auth/signup \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
@@ -355,7 +355,7 @@ curl -X POST http://localhost:8080/signup \
 ### 2. 間違ったパスワードでのLogin
 
 ```bash
-curl -X POST http://localhost:8080/login \
+curl -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
@@ -373,7 +373,7 @@ curl -X POST http://localhost:8080/login \
 ### 3. 無効なトークンでのAPIアクセス
 
 ```bash
-curl -X GET http://localhost:8080/api/users \
+curl -X GET http://localhost:8080/api/v1/users \
   -H "Authorization: Bearer invalid_token_here"
 ```
 
