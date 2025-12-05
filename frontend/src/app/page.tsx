@@ -93,8 +93,12 @@ export default function Home() {
 
       {!isMobile && (
         <div style={styles.nav}>
-          <span>🏠 ホーム</span>
-          <span>📡 情報</span>
+          <Link href="/" style={styles.link}>
+            🏠 ホーム
+          </Link>
+          <Link href="/info" style={styles.link}>
+            📡 情報
+          </Link>
           <Link href="/setting" style={styles.link}>
             ⚙️ 設定
           </Link>
