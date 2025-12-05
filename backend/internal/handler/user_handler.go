@@ -1,0 +1,94 @@
+package handler
+
+import (
+	"net/http"
+	"strconv"
+
+	"github.com/labstack/echo/v4"
+
+	"zerodelay/internal/domain/model"
+	"zerodelay/internal/service"
+)
+
+// UserHandler handles HTTP requests for users
+type UserHandler struct {
+	userService *service.UserService
+}
+
+// NewUserHandler creates a new user handler
+func NewUserHandler(userService *service.UserService) *UserHandler {
+	return &UserHandler{userService: userService}
+}
+
+// CreateUser handles POST /api/users
+func (h *UserHandler) CreateUser(c echo.Context) error {
+	var user model.User
+	if err := c.Bind(&user); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
+	}
+
+	if err := h.userService.CreateUser(&user); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusCreated, user)
+}
+
+// GetUser handles GET /api/users/:id
+func (h *UserHandler) GetUser(c echo.Context) error {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid user ID"})
+	}
+
+	user, err := h.userService.GetUser(uint(id))
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "User not found"})
+	}
+
+	return c.JSON(http.StatusOK, user)
+}
+
+// GetAllUsers handles GET /api/users
+func (h *UserHandler) GetAllUsers(c echo.Context) error {
+	users, err := h.userService.GetAllUsers()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, users)
+}
+
+// UpdateUser handles PUT /api/users/:id
+func (h *UserHandler) UpdateUser(c echo.Context) error {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid user ID"})
+	}
+
+	var user model.User
+	if err := c.Bind(&user); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
+	}
+	user.ID = uint(id)
+
+	if err := h.userService.UpdateUser(&user); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, user)
+}
+
+// DeleteUser handles DELETE /api/users/:id
+func (h *UserHandler) DeleteUser(c echo.Context) error {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid user ID"})
+	}
+
+	if err := h.userService.DeleteUser(uint(id)); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"message": "User deleted successfully"})
+}
