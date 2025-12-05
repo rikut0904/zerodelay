@@ -13,6 +13,7 @@ type AuthRepository interface {
 	Login(ctx context.Context, req *model.LoginRequest) (*model.AuthResponse, error)
 	VerifyIDToken(ctx context.Context, idToken string) (string, error)
 	UpdateEmail(ctx context.Context, uid string, newEmail string) error
+	DeleteUser(ctx context.Context, uid string) error
 	SendEmailVerification(ctx context.Context, idToken string) error
 	GetUser(ctx context.Context, uid string) (*fbauth.UserRecord, error)
 }

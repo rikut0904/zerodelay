@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 
 	"zerodelay/internal/domain/model"
 	"zerodelay/internal/domain/repository"
@@ -42,8 +43,9 @@ func (s *AuthService) SignUp(ctx context.Context, req *model.SignUpRequest) (*mo
 	}
 
 	if err := s.userRepo.Create(user); err != nil {
-		// PostgreSQL保存失敗時もFirebaseユーザーは作成済み
-		// ログを出力してエラーを返す
+		if delErr := s.authRepo.DeleteUser(ctx, authResp.LocalID); delErr != nil {
+			log.Printf("[ERROR] Failed to rollback Firebase user %s: %v", authResp.LocalID, delErr)
+		}
 		return nil, fmt.Errorf("failed to create user in database: %w", err)
 	}
 

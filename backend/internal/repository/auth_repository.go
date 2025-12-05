@@ -160,6 +160,15 @@ func (r *authRepository) UpdateEmail(ctx context.Context, uid string, newEmail s
 	return nil
 }
 
+func (r *authRepository) DeleteUser(ctx context.Context, uid string) error {
+	if err := r.firebaseAuth.DeleteUser(ctx, uid); err != nil {
+		log.Printf("[ERROR] Failed to delete Firebase user %s: %v", uid, err)
+		return fmt.Errorf("failed to delete Firebase user: %w", err)
+	}
+	log.Printf("[INFO] Deleted Firebase user: %s", uid)
+	return nil
+}
+
 func (r *authRepository) SendEmailVerification(ctx context.Context, idToken string) error {
 	payload := map[string]string{
 		"requestType": "VERIFY_EMAIL",
@@ -180,8 +189,7 @@ func (r *authRepository) SendEmailVerification(ctx context.Context, idToken stri
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := r.httpClient.Do(req)
 	if err != nil {
 		log.Printf("[ERROR] Failed to send email verification: %v", err)
 		return fmt.Errorf("failed to send email verification: %w", err)
