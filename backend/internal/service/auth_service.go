@@ -80,8 +80,7 @@ func (s *AuthService) Login(ctx context.Context, req *model.LoginRequest) (*mode
 	// 3. PostgreSQL からユーザー情報を取得
 	dbUser, err := s.userRepo.FindByFirebaseUID(authResp.LocalID)
 	if err != nil {
-		// ユーザーが見つからない場合は警告ログを出して続行
-		// （Firebase認証は成功しているため）
+		log.Printf("[WARN] User not found in database for Firebase UID %s: %v", authResp.LocalID, err)
 		return authResp, nil
 	}
 
