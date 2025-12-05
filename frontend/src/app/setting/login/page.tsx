@@ -98,7 +98,9 @@ export default function LoginPage() {
                 style={toggleButtonStyle}
                 aria-label={showPassword ? "パスワードを隠す" : "パスワードを表示"}
               >
-                {showPassword ? "🙈" : "👁"}
+                <span className="material-symbols-outlined" aria-hidden="true">
+                  {showPassword ? "visibility_off" : "visibility"}
+                </span>
               </button>
             </div>
           </label>
@@ -189,9 +191,13 @@ const passwordWrapperStyle: CSSProperties = {
 const toggleButtonStyle: CSSProperties = {
   position: "absolute",
   right: "0.65rem",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "0.15rem",
   background: "transparent",
   border: "none",
   cursor: "pointer",
-  fontSize: "1.1rem",
   lineHeight: 1,
+  color: "#4b5563",
 };

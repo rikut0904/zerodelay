@@ -58,10 +58,13 @@ export default function SigninPage() {
       <div style={cardStyle}>
         <h1 style={{ marginBottom: "0.5rem", fontSize: "1.5rem" }}>新規登録</h1>
         <p style={{ marginBottom: "1.5rem", color: "#4b5563", fontSize: "0.95rem" }}>
-          登録後に送信されるメールからアカウントを有効化してください。
+          メールアドレスとパスワードを入力し、認証メールから登録を完了してください。
         </p>
 
-        <form onSubmit={handleSignup} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <form
+          onSubmit={handleSignup}
+          style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+        >
           <label style={labelStyle}>
             メールアドレス
             <input
@@ -71,6 +74,7 @@ export default function SigninPage() {
               onChange={(event) => setEmail(event.target.value)}
               style={inputStyle}
               placeholder="example@example.com"
+              autoComplete="email"
             />
           </label>
 
@@ -85,6 +89,7 @@ export default function SigninPage() {
                 onChange={(event) => setPassword(event.target.value)}
                 style={{ ...inputStyle, paddingRight: "2.75rem" }}
                 placeholder="8文字以上"
+                autoComplete="new-password"
               />
               <button
                 type="button"
@@ -92,10 +97,16 @@ export default function SigninPage() {
                 style={toggleButtonStyle}
                 aria-label={showPassword ? "パスワードを隠す" : "パスワードを表示"}
               >
-                {showPassword ? "🙈" : "👁"}
+                <span className="material-symbols-outlined" aria-hidden="true">
+                  {showPassword ? "visibility_off" : "visibility"}
+                </span>
               </button>
             </div>
           </label>
+
+          <p style={{ margin: 0, color: "#6b7280", fontSize: "0.85rem" }}>
+            登録完了後はログインページからサインインできます。
+          </p>
 
           <button type="submit" style={buttonStyle(loading)} disabled={loading}>
             {loading ? "送信中..." : "登録する"}
@@ -124,7 +135,7 @@ const pageWrapperStyle: CSSProperties = {
   justifyContent: "center",
   padding: "2rem",
   background:
-    "radial-gradient(circle at top, rgba(14,165,233,0.15), transparent 40%), #f9fafb",
+    "radial-gradient(circle at top, rgba(37,99,235,0.15), transparent 40%), #f9fafb",
 };
 
 const cardStyle: CSSProperties = {
@@ -160,7 +171,7 @@ const buttonStyle = (disabled: boolean): CSSProperties => ({
   borderRadius: "999px",
   border: "none",
   background:
-    "linear-gradient(120deg, rgba(14,165,233,1) 0%, rgba(59,130,246,1) 100%)",
+    "linear-gradient(120deg, rgba(59,130,246,1) 0%, rgba(37,99,235,1) 100%)",
   color: "#ffffff",
   fontWeight: 700,
   fontSize: "1rem",
@@ -183,9 +194,13 @@ const passwordWrapperStyle: CSSProperties = {
 const toggleButtonStyle: CSSProperties = {
   position: "absolute",
   right: "0.65rem",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "0.15rem",
   background: "transparent",
   border: "none",
   cursor: "pointer",
-  fontSize: "1.1rem",
   lineHeight: 1,
+  color: "#4b5563",
 };
