@@ -5,13 +5,14 @@ import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import MapView from "@/components/MapView";
 
-
 export default function Home() {
   const [alertText, setAlertText] = useState("警報情報を取得中...");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false); // ← 追加：スマホ判定用
+  const [isMobile, setIsMobile] = useState(false);
 
-  // 📱 画面幅によってスマホかどうか判定
+  const [map, setMap] = useState<any>(null);
+  const [currentPos, setCurrentPos] = useState<[number, number] | null>(null);
+
   useEffect(() => {
     const checkWidth = () => setIsMobile(window.innerWidth < 768);
     checkWidth();
@@ -19,19 +20,15 @@ export default function Home() {
     return () => window.removeEventListener("resize", checkWidth);
   }, []);
 
+  const returnToCurrentLocation = () => {
+    if (map && currentPos) {
+      map.flyTo(currentPos, 17, { duration: 1.2 });
+    }
+  };
+
   return (
     <div style={styles.container}>
-      {/* 🔍 検索バー＋メニューアイコン */}
       <div style={styles.header}>
-        <div style={styles.searchBar}>
-          <input
-            type="text"
-            placeholder="住所・施設名を入力"
-            style={styles.searchInput}
-          />
-        </div>
-
-        {/* スマホ時だけ三本線を表示 */}
         {isMobile && (
           <div
             style={styles.menuIcon}
@@ -42,7 +39,6 @@ export default function Home() {
         )}
       </div>
 
-      {/* スマホ時：ハンバーガーメニュー */}
       {menuOpen && isMobile && (
         <div style={styles.drawer}>
           <Link href="/" style={styles.drawerItem}>🏠 ホーム</Link>
@@ -51,7 +47,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* 災害ボタン */}
       <div style={styles.buttons}>
         <button style={styles.button}>洪水</button>
         <button style={styles.button}>津波</button>
@@ -60,9 +55,30 @@ export default function Home() {
 
       {/* 地図エリア */}
       <div style={styles.mapArea}>
-        <MapView />
+        <MapView
+          onMapReady={setMap}
+          onPositionChange={setCurrentPos}  
+        />
+
+        <button
+          onClick={returnToCurrentLocation}
+          style={{
+            position: "absolute",
+            bottom: "20px",
+            right: "20px",
+            padding: "10px 14px",
+            backgroundColor: "#4A90E2",
+            color: "white",
+            borderRadius: "8px",
+            border: "none",
+            cursor: "pointer",
+            zIndex: 2000,
+          }}
+        >
+          📍 現在地へ戻る
+        </button>
       </div>
-      {/* PC時のみナビ表示 */}
+
       {!isMobile && (
         <div style={styles.nav}>
           <span>🏠 ホーム</span>
@@ -76,7 +92,6 @@ export default function Home() {
   );
 }
 
-// 🎨 スタイル
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
     fontFamily: "sans-serif",
@@ -90,19 +105,11 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   header: {
     display: "flex",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
     backgroundColor: "#fff",
     padding: "8px 12px",
     boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-  },
-  searchBar: {
-    flex: 1,
-  },
-  searchInput: {
-    width: "80%",
-    padding: "8px",
-    fontSize: "var(--app-font-size)",
   },
   menuIcon: {
     cursor: "pointer",
@@ -146,13 +153,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     width: "100%",
     display: "flex",
     position: "relative",
-  },
-
-  alert: {
-    backgroundColor: "#ffeb3b",
-    padding: "10px",
-    fontWeight: "bold",
-    fontSize: "var(--app-font-size)",
   },
   nav: {
     display: "flex",

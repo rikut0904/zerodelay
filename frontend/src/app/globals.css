@@ -12,25 +12,15 @@ body {
   overflow-x: hidden;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+
+  /* 🌟 デフォルト文字サイズ*/
+  --app-font-size: 16px;
+
+  --button-padding: 10px 20px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -41,39 +31,30 @@ a {
   }
 }
 
-:root {
-  --app-font-size: 16px; /* デフォルト文字サイズ */
-}
-
 body {
-  font-size: 16px; /* 固定 */
+  font-size: var(--app-font-size);
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
   transition: font-size 0.2s ease;
 }
 
-/* ===============================
-   スマホ・PCで文字サイズを自動調整
-   =============================== */
-:root {
-  --app-font-size: 16px;
-  --button-padding: 10px 20px;
-}
-
-/* タブレット以上（画面幅768px〜） */
 @media (min-width: 768px) {
   :root {
-    --app-font-size: 17px;
     --button-padding: 11px 22px;
   }
 }
 
-/* PC以上（画面幅1024px〜） */
 @media (min-width: 1024px) {
   :root {
-    --app-font-size: 18px;
     --button-padding: 12px 24px;
   }
 }
-/* スマホ（幅768px未満）では下のナビゲーションを隠す */
+
 @media (max-width: 767px) {
   [style*="nav"] {
     display: none !important;

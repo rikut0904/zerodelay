@@ -11,42 +11,47 @@ const fontSizeMap: Record<string, string> = {
 export default function SettingPage() {
   const [openModal, setOpenModal] = useState<string | null>(null);
 
-  // 📍 地域設定
-  const [useCurrentLocation, setUseCurrentLocation] = useState(false);
+  // 📍 表示する地域設定
+  const [regionSetting, setRegionSetting] = useState<string>("current");
 
-  // 🗺️ マップ表示設定
+  // 🗺️ ハザードマップレイヤー
   const [mapLayers, setMapLayers] = useState({
     避難所: false,
     河川水位: false,
     土砂危険エリア: false,
   });
 
-  // 👀 見やすさ設定
-  const [fontSize, setFontSize] = useState("medium");
+  // 👀 文字サイズ
+  const [fontSize, setFontSize] = useState<string>("medium");
 
-  // 🔄 初回読み込み
+  // 🔄 ロード時に localStorage を復元
   useEffect(() => {
-    const savedLocation = localStorage.getItem("useCurrentLocation");
     const savedLayers = localStorage.getItem("mapLayers");
     const savedFontSize = localStorage.getItem("fontSize");
+    const savedRegion = localStorage.getItem("regionSetting");
 
-    if (savedLocation) setUseCurrentLocation(JSON.parse(savedLocation));
     if (savedLayers) setMapLayers(JSON.parse(savedLayers));
+
     if (savedFontSize) {
-      setFontSize(savedFontSize);
+      const parsedFont = JSON.parse(savedFontSize);
+      setFontSize(parsedFont);
       document.documentElement.style.setProperty(
         "--app-font-size",
-        fontSizeMap[savedFontSize]
+        fontSizeMap[parsedFont]
+      );
+    } else {
+      localStorage.setItem("fontSize", JSON.stringify("medium"));
+      document.documentElement.style.setProperty(
+        "--app-font-size",
+        fontSizeMap["medium"]
       );
     }
+
+    if (savedRegion) setRegionSetting(JSON.parse(savedRegion));
   }, []);
 
-  // 🧠 自動保存関数
-  const autoSave = (
-    key: string,
-    value: any,
-    extraEffect?: () => void
-  ) => {
+  // 🧠 自動保存
+  const autoSave = (key: string, value: any, extraEffect?: () => void) => {
     localStorage.setItem(key, JSON.stringify(value));
     if (extraEffect) extraEffect();
   };
@@ -55,58 +60,69 @@ export default function SettingPage() {
     <div style={styles.container}>
       <h1 style={styles.title}>⚙️ 設定</h1>
 
-      {/* 🧑‍💻 見た目だけのログインフォーム */}
-      <section style={styles.section}>
-        <h2 style={styles.subtitle}>🔐 ログイン</h2>
-        <p style={{ marginBottom: 10, color: "#555" }}>
-          メールアドレスとパスワードを入力してください。
-        </p>
-        <form style={styles.form}>
-          <label style={styles.label}>
-            メールアドレス：
-            <input type="email" placeholder="example@example.com" style={styles.input} />
-          </label>
-          <label style={styles.label}>
-            パスワード：
-            <input type="password" placeholder="••••••••" style={styles.input} />
-          </label>
-          <button type="button" style={styles.button}>
-            ログイン
-          </button>
-        </form>
-      </section>
-
-      {/* 各設定項目ボタン */}
+      {/* 設定ボタン */}
       <section style={styles.section}>
         <button style={styles.itemButton} onClick={() => setOpenModal("region")}>
           📍 表示する地域の設定
         </button>
+
         <button style={styles.itemButton} onClick={() => setOpenModal("map")}>
           🗺️ ハザードマップの表示設定
         </button>
+
         <button style={styles.itemButton} onClick={() => setOpenModal("view")}>
           👀 画面の見やすさ設定
         </button>
       </section>
 
-      {/* 📍 地域設定モーダル */}
+      {/* 📍 地域設定 */}
       {openModal === "region" && (
         <Modal title="📍 表示する地域の設定" onClose={() => setOpenModal(null)}>
           <label style={styles.label}>
             <input
-              type="checkbox"
-              checked={useCurrentLocation}
+              type="radio"
+              name="region"
+              value="current"
+              checked={regionSetting === "current"}
               onChange={(e) => {
-                setUseCurrentLocation(e.target.checked);
-                autoSave("useCurrentLocation", e.target.checked);
+                setRegionSetting(e.target.value);
+                autoSave("regionSetting", e.target.value);
               }}
-            />{" "}
+            />
             現在地を使用
+          </label>
+
+          <label style={styles.label}>
+            <input
+              type="radio"
+              name="region"
+              value="kit"
+              checked={regionSetting === "kit"}
+              onChange={(e) => {
+                setRegionSetting(e.target.value);
+                autoSave("regionSetting", e.target.value);
+              }}
+            />
+            金沢工業大学
+          </label>
+
+          <label style={styles.label}>
+            <input
+              type="radio"
+              name="region"
+              value="cityhall"
+              checked={regionSetting === "cityhall"}
+              onChange={(e) => {
+                setRegionSetting(e.target.value);
+                autoSave("regionSetting", e.target.value);
+              }}
+            />
+            金沢市役所
           </label>
         </Modal>
       )}
 
-      {/* 🗺️ 地図表示モーダル */}
+      {/* 🗺️ 地図レイヤー */}
       {openModal === "map" && (
         <Modal title="🗺️ ハザードマップの表示設定" onClose={() => setOpenModal(null)}>
           {Object.keys(mapLayers).map((key) => (
@@ -115,24 +131,25 @@ export default function SettingPage() {
                 type="checkbox"
                 checked={mapLayers[key as keyof typeof mapLayers]}
                 onChange={(e) => {
-                  const newState = {
+                  const updated = {
                     ...mapLayers,
                     [key]: e.target.checked,
                   };
-                  setMapLayers(newState);
-                  autoSave("mapLayers", newState);
+                  setMapLayers(updated);
+                  autoSave("mapLayers", updated);
                 }}
-              />{" "}
+              />
               {key} を表示
             </label>
           ))}
         </Modal>
       )}
 
-      {/* 👀 見やすさ設定モーダル */}
+      {/* 👀 見た目 */}
       {openModal === "view" && (
         <Modal title="👀 画面の見やすさ設定" onClose={() => setOpenModal(null)}>
           <h3 style={styles.optionTitle}>🅰️ 文字サイズの変更</h3>
+
           {["small", "medium", "large"].map((size) => (
             <label key={size} style={styles.label}>
               <input
@@ -149,17 +166,17 @@ export default function SettingPage() {
                     );
                   });
                 }}
-              />{" "}
+              />
               {size === "small" ? "小" : size === "medium" ? "中" : "大"}
             </label>
           ))}
         </Modal>
       )}
 
-      {/* 下部固定ナビ */}
+      {/* 🔻 下のナビ —— 情報欄は残す！ */}
       <div style={styles.nav}>
         <Link href="/" style={styles.link}>🏠 ホーム</Link>
-        <span>📡 情報</span>
+        <Link href="/info" style={styles.link}>📡 情報</Link>
         <Link href="/setting" style={styles.link}>⚙️ 設定</Link>
       </div>
     </div>
@@ -179,71 +196,54 @@ function Modal({
   return (
     <div style={modalStyles.overlay}>
       <div style={modalStyles.content}>
-        <h2 style={{ marginBottom: 10 }}>{title}</h2>
+        <h2>{title}</h2>
         <div>{children}</div>
-        <button style={modalStyles.closeButton} onClick={onClose}>
-          ✖ 閉じる
-        </button>
+        <button style={modalStyles.closeButton} onClick={onClose}>✖ 閉じる</button>
       </div>
     </div>
   );
 }
 
 /* 🎨 スタイル */
-const styles: { [key: string]: React.CSSProperties } = {
+const styles: Record<string, React.CSSProperties> = {
   container: {
     padding: "60px 20px 80px",
-    fontFamily: "sans-serif",
     backgroundColor: "#f9f9f9",
     minHeight: "100vh",
+    fontFamily: "sans-serif",
   },
-  title: { fontSize: 24, marginBottom: 20 },
+  title: { 
+    fontSize: "1.5em",
+    marginBottom: 20,
+  },
   section: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 24,
-    marginBottom: 32,
     padding: 12,
     border: "1px solid #ddd",
     borderRadius: 12,
     background: "#fafafa",
-  },
-  subtitle: { fontSize: 18, marginBottom: 10 },
-  form: {
+    marginBottom: 32,
     display: "flex",
     flexDirection: "column",
-    gap: 8,
-    marginTop: 8,
-  },
-  input: {
-    width: "100%",
-    padding: 8,
-    marginTop: 4,
-    borderRadius: 6,
-    border: "1px solid #ccc",
-    fontSize: 14,
-  },
-  button: {
-    backgroundColor: "#0070f3",
-    color: "#fff",
-    padding: "10px 0",
-    border: "none",
-    borderRadius: 6,
-    cursor: "pointer",
-    marginTop: 8,
+    gap: 20,
   },
   itemButton: {
+    fontSize: "var(--app-font-size)",
     padding: "14px 16px",
-    fontSize: "16px",
-    textAlign: "left",
-    border: "1px solid #ccc",
     borderRadius: 8,
-    backgroundColor: "#fff",
+    border: "1px solid #ccc",
+    background: "#fff",
+    textAlign: "left",
     cursor: "pointer",
-    width: "100%",
   },
-  label: { display: "block", margin: "8px 0" },
-  optionTitle: { fontSize: 16, marginBottom: 6 },
+  label: {
+    fontSize: "var(--app-font-size)",
+    margin: "6px 0",
+    display: "block",
+  },
+  optionTitle: {
+    fontSize: "1.1em",
+    marginBottom: 8,
+  },
   nav: {
     position: "fixed",
     bottom: 0,
@@ -255,10 +255,14 @@ const styles: { [key: string]: React.CSSProperties } = {
     padding: "10px 0",
     borderTop: "1px solid #ccc",
   },
-  link: { textDecoration: "none", color: "black" },
+  link: {
+    textDecoration: "none",
+    color: "black",
+    fontSize: "var(--app-font-size)",
+  },
 };
 
-const modalStyles: { [key: string]: React.CSSProperties } = {
+const modalStyles: Record<string, React.CSSProperties> = {
   overlay: {
     position: "fixed",
     top: 0,
@@ -269,7 +273,6 @@ const modalStyles: { [key: string]: React.CSSProperties } = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 2000,
   },
   content: {
     backgroundColor: "#fff",
@@ -277,11 +280,10 @@ const modalStyles: { [key: string]: React.CSSProperties } = {
     borderRadius: 12,
     width: "90%",
     maxWidth: 400,
-    boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
   },
   closeButton: {
-    marginTop: 16,
     width: "100%",
+    marginTop: 16,
     padding: "10px",
     backgroundColor: "#999",
     color: "#fff",
