@@ -114,12 +114,7 @@ export default function MapView({
   }
 
   return (
-    <MapContainer
-      key={position.toString()}
-      center={position}
-      zoom={17}
-      style={{ height: "100%", width: "100%" }}
-    >
+    <MapContainer center={position} zoom={17} style={{ height: "100%", width: "100%" }}>
       <SetCenter position={position} />
       <MapInitializer onMapReady={onMapReady} />
       <ScaleControl position="bottomleft" imperial={false} />
