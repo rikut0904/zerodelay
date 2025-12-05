@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import Modal from "@/components/Modal";
 
 const fontSizeMap: Record<string, string> = {
   small: "14px",
@@ -197,28 +198,6 @@ export default function SettingPage() {
   );
 }
 
-function Modal({
-  title,
-  children,
-  onClose,
-}: {
-  title: string;
-  children: React.ReactNode;
-  onClose: () => void;
-}) {
-  return (
-    <div style={modalStyles.overlay}>
-      <div style={modalStyles.content}>
-        <h2 style={{ marginBottom: 10 }}>{title}</h2>
-        <div>{children}</div>
-        <button style={modalStyles.closeButton} onClick={onClose}>
-          ✖ 閉じる
-        </button>
-      </div>
-    </div>
-  );
-}
-
 const styles: Record<string, React.CSSProperties> = {
   container: {
     padding: "60px 20px 80px",
@@ -297,38 +276,5 @@ const styles: Record<string, React.CSSProperties> = {
     textDecoration: "none",
     color: "black",
     fontSize: "var(--app-font-size)",
-  },
-};
-
-const modalStyles: Record<string, React.CSSProperties> = {
-  overlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100vw",
-    height: "100vh",
-    backgroundColor: "rgba(0,0,0,0.4)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 2000,
-  },
-  content: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 12,
-    width: "90%",
-    maxWidth: 400,
-    boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
-  },
-  closeButton: {
-    width: "100%",
-    marginTop: 16,
-    padding: "10px",
-    backgroundColor: "#999",
-    color: "#fff",
-    border: "none",
-    borderRadius: 8,
-    cursor: "pointer",
   },
 };
