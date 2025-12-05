@@ -4,23 +4,18 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import dynamic from "next/dynamic";
+
 const MapView = dynamic(() => import("@/components/MapView"), { ssr: false });
 
 export default function Home() {
-  const [alertText, setAlertText] = useState("警報情報を取得中...");
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-
   const [map, setMap] = useState<any>(null);
   const [currentPos, setCurrentPos] = useState<[number, number] | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-
-    const checkWidth = () =>{
-      setIsMobile(window.innerWidth < 768);
-    };
-
+    const checkWidth = () => setIsMobile(window.innerWidth < 768);
     checkWidth();
     window.addEventListener("resize", checkWidth);
     return () => window.removeEventListener("resize", checkWidth);
@@ -34,7 +29,16 @@ export default function Home() {
 
   return (
     <div style={styles.container}>
+      {/* 🔍 検索バー＋メニューアイコン */}
       <div style={styles.header}>
+        <div style={styles.searchBar}>
+          <input
+            type="text"
+            placeholder="住所・施設名を入力"
+            style={styles.searchInput}
+          />
+        </div>
+
         {isMobile && (
           <div
             style={styles.menuIcon}
@@ -47,9 +51,15 @@ export default function Home() {
 
       {menuOpen && isMobile && (
         <div style={styles.drawer}>
-          <Link href="/" style={styles.drawerItem}>🏠 ホーム</Link>
-          <Link href="/info" style={styles.drawerItem}>📡 情報</Link>
-          <Link href="/setting" style={styles.drawerItem}>⚙️ 設定</Link>
+          <Link href="/" style={styles.drawerItem}>
+            🏠 ホーム
+          </Link>
+          <Link href="/info" style={styles.drawerItem}>
+            📡 情報
+          </Link>
+          <Link href="/setting" style={styles.drawerItem}>
+            ⚙️ 設定
+          </Link>
         </div>
       )}
 
@@ -59,12 +69,8 @@ export default function Home() {
         <button style={styles.button}>地震</button>
       </div>
 
-      {/* 地図エリア */}
       <div style={styles.mapArea}>
-        <MapView
-          onMapReady={setMap}
-          onPositionChange={setCurrentPos}  
-        />
+        <MapView onMapReady={setMap} onPositionChange={setCurrentPos} />
 
         <button
           onClick={returnToCurrentLocation}
@@ -111,11 +117,19 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   header: {
     display: "flex",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#fff",
     padding: "8px 12px",
     boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+  },
+  searchBar: {
+    flex: 1,
+  },
+  searchInput: {
+    width: "80%",
+    padding: "8px",
+    fontSize: "var(--app-font-size)",
   },
   menuIcon: {
     cursor: "pointer",

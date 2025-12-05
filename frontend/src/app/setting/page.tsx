@@ -10,22 +10,17 @@ const fontSizeMap: Record<string, string> = {
 
 export default function SettingPage() {
   const [openModal, setOpenModal] = useState<string | null>(null);
-
-  // 📍 表示する地域設定
   const [regionSetting, setRegionSetting] = useState<string>("current");
-
-  // 🗺️ ハザードマップレイヤー
   const [mapLayers, setMapLayers] = useState({
     避難所: false,
     河川水位: false,
     土砂危険エリア: false,
   });
-
-  // 👀 文字サイズ
   const [fontSize, setFontSize] = useState<string>("medium");
 
-  // 🔄 ロード時に localStorage を復元
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const savedLayers = localStorage.getItem("mapLayers");
     const savedFontSize = localStorage.getItem("fontSize");
     const savedRegion = localStorage.getItem("regionSetting");
@@ -50,7 +45,6 @@ export default function SettingPage() {
     if (savedRegion) setRegionSetting(JSON.parse(savedRegion));
   }, []);
 
-  // 🧠 自動保存
   const autoSave = (key: string, value: any, extraEffect?: () => void) => {
     localStorage.setItem(key, JSON.stringify(value));
     if (extraEffect) extraEffect();
@@ -60,7 +54,6 @@ export default function SettingPage() {
     <div style={styles.container}>
       <h1 style={styles.title}>⚙️ 設定</h1>
 
-      {/* 設定ボタン */}
       <section style={styles.section}>
         <button style={styles.itemButton} onClick={() => setOpenModal("region")}>
           📍 表示する地域の設定
@@ -75,7 +68,6 @@ export default function SettingPage() {
         </button>
       </section>
 
-      {/* 📍 地域設定 */}
       {openModal === "region" && (
         <Modal title="📍 表示する地域の設定" onClose={() => setOpenModal(null)}>
           <label style={styles.label}>
@@ -122,7 +114,6 @@ export default function SettingPage() {
         </Modal>
       )}
 
-      {/* 🗺️ 地図レイヤー */}
       {openModal === "map" && (
         <Modal title="🗺️ ハザードマップの表示設定" onClose={() => setOpenModal(null)}>
           {Object.keys(mapLayers).map((key) => (
@@ -145,7 +136,6 @@ export default function SettingPage() {
         </Modal>
       )}
 
-      {/* 👀 見た目 */}
       {openModal === "view" && (
         <Modal title="👀 画面の見やすさ設定" onClose={() => setOpenModal(null)}>
           <h3 style={styles.optionTitle}>🅰️ 文字サイズの変更</h3>
@@ -173,17 +163,21 @@ export default function SettingPage() {
         </Modal>
       )}
 
-      {/* 🔻 下のナビ —— 情報欄は残す！ */}
       <div style={styles.nav}>
-        <Link href="/" style={styles.link}>🏠 ホーム</Link>
-        <Link href="/info" style={styles.link}>📡 情報</Link>
-        <Link href="/setting" style={styles.link}>⚙️ 設定</Link>
+        <Link href="/" style={styles.link}>
+          🏠 ホーム
+        </Link>
+        <Link href="/info" style={styles.link}>
+          📡 情報
+        </Link>
+        <Link href="/setting" style={styles.link}>
+          ⚙️ 設定
+        </Link>
       </div>
     </div>
   );
 }
 
-/* 🪟 モーダル */
 function Modal({
   title,
   children,
@@ -196,15 +190,16 @@ function Modal({
   return (
     <div style={modalStyles.overlay}>
       <div style={modalStyles.content}>
-        <h2>{title}</h2>
+        <h2 style={{ marginBottom: 10 }}>{title}</h2>
         <div>{children}</div>
-        <button style={modalStyles.closeButton} onClick={onClose}>✖ 閉じる</button>
+        <button style={modalStyles.closeButton} onClick={onClose}>
+          ✖ 閉じる
+        </button>
       </div>
     </div>
   );
 }
 
-/* 🎨 スタイル */
 const styles: Record<string, React.CSSProperties> = {
   container: {
     padding: "60px 20px 80px",
@@ -212,8 +207,8 @@ const styles: Record<string, React.CSSProperties> = {
     minHeight: "100vh",
     fontFamily: "sans-serif",
   },
-  title: { 
-    fontSize: "1.5em",
+  title: {
+    fontSize: 24,
     marginBottom: 20,
   },
   section: {
@@ -224,7 +219,31 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: 32,
     display: "flex",
     flexDirection: "column",
-    gap: 20,
+    gap: 18,
+  },
+  subtitle: {
+    fontSize: 18,
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+  },
+  input: {
+    width: "100%",
+    padding: 8,
+    marginTop: 4,
+    borderRadius: 6,
+    border: "1px solid #ccc",
+    fontSize: 14,
+  },
+  button: {
+    backgroundColor: "#0070f3",
+    color: "#fff",
+    padding: "10px 0",
+    border: "none",
+    borderRadius: 6,
+    cursor: "pointer",
   },
   itemButton: {
     fontSize: "var(--app-font-size)",
@@ -273,6 +292,7 @@ const modalStyles: Record<string, React.CSSProperties> = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 2000,
   },
   content: {
     backgroundColor: "#fff",
@@ -280,6 +300,7 @@ const modalStyles: Record<string, React.CSSProperties> = {
     borderRadius: 12,
     width: "90%",
     maxWidth: 400,
+    boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
   },
   closeButton: {
     width: "100%",
