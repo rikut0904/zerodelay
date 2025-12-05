@@ -28,7 +28,7 @@ func (h *AuthHandler) SignUp(c echo.Context) error {
 	resp, err := h.authService.SignUp(c.Request().Context(), &req)
 	if err != nil {
 		log.Printf("[ERROR] SignUp failed: %v", err)
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "ユーザー登録に失敗しました"})
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, resp)
@@ -44,7 +44,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	resp, err := h.authService.Login(c.Request().Context(), &req)
 	if err != nil {
 		log.Printf("[ERROR] Login failed: %v", err)
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "ログインに失敗しました"})
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, resp)

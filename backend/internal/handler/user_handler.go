@@ -122,7 +122,7 @@ func (h *UserHandler) UpdateProfile(c echo.Context) error {
 	user, err := h.userService.UpdateProfile(c.Request().Context(), firebaseUID, &req)
 	if err != nil {
 		log.Printf("[ERROR] UpdateProfile failed for UID %s: %v", firebaseUID, err)
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "プロフィールの更新に失敗しました"})
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, user)
