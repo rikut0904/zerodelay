@@ -11,16 +11,15 @@ import (
 	"os"
 
 	fbauth "firebase.google.com/go/v4/auth"
-	"github.com/joho/godotenv"
 
 	"zerodelay/internal/domain/model"
 )
 
 const (
-	firebaseAuthBaseURL       = "https://identitytoolkit.googleapis.com/v1"
-	signUpEndpoint            = "/accounts:signUp"
-	signInEndpoint            = "/accounts:signInWithPassword"
-	sendVerificationEndpoint  = "/accounts:sendOobCode"
+	firebaseAuthBaseURL      = "https://identitytoolkit.googleapis.com/v1"
+	signUpEndpoint           = "/accounts:signUp"
+	signInEndpoint           = "/accounts:signInWithPassword"
+	sendVerificationEndpoint = "/accounts:sendOobCode"
 )
 
 type authRepository struct {
@@ -30,9 +29,6 @@ type authRepository struct {
 }
 
 func NewAuthRepository(firebaseAuth *fbauth.Client) *authRepository {
-	if err := godotenv.Load(); err != nil {
-		log.Printf("[WARN] Failed to load .env file: %v", err)
-	}
 	apiKey := os.Getenv("FIREBASE_API_KEY")
 	if apiKey == "" {
 		log.Println("[WARN] FIREBASE_API_KEY is not set in .env file")
