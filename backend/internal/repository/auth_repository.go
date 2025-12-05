@@ -84,13 +84,23 @@ func (r *authRepository) callFirebaseAuthAPI(ctx context.Context, endpoint strin
 		return nil, fmt.Errorf("firebase error: %s", fbErr.Error.Message)
 	}
 
-	var authResp model.AuthResponse
-	if err := json.Unmarshal(respBody, &authResp); err != nil {
+	var fbResp model.FirebaseAuthResponse
+	if err := json.Unmarshal(respBody, &fbResp); err != nil {
 		log.Printf("[ERROR] Failed to parse auth response: %v", err)
 		return nil, fmt.Errorf("failed to parse response: %w", err)
 	}
 
-	return &authResp, nil
+	// FirebaseAuthResponseをAuthResponseに変換
+	authResp := &model.AuthResponse{
+		IDToken:      fbResp.IDToken,
+		RefreshToken: fbResp.RefreshToken,
+		ExpiresIn:    fbResp.ExpiresIn,
+		Email:        fbResp.Email,
+		LocalID:      fbResp.LocalID,
+		Registered:   fbResp.Registered,
+	}
+
+	return authResp, nil
 }
 
 func (r *authRepository) SignUp(ctx context.Context, req *model.SignUpRequest) (*model.AuthResponse, error) {
@@ -181,13 +191,14 @@ func (r *authRepository) SendEmailVerification(ctx context.Context, idToken stri
 	}
 	defer resp.Body.Close()
 
+	respBody, _ := io.ReadAll(resp.Body)
+
 	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(resp.Body)
 		log.Printf("[ERROR] Email verification failed with status %d: %s", resp.StatusCode, string(respBody))
 		return fmt.Errorf("failed to send email verification: status %d", resp.StatusCode)
 	}
 
-	log.Println("[INFO] Email verification sent successfully")
+	log.Printf("[INFO] Email verification sent successfully. Response: %s", string(respBody))
 	return nil
 }
 

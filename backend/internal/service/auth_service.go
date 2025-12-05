@@ -49,6 +49,11 @@ func (s *AuthService) SignUp(ctx context.Context, req *model.SignUpRequest) (*mo
 	// 4. レスポンスにユーザー情報を追加
 	authResp.User = user
 
+	// 5. サインアップ時はトークン情報を返さない（メール確認後にログインが必要）
+	authResp.IDToken = ""
+	authResp.RefreshToken = ""
+	authResp.ExpiresIn = ""
+
 	return authResp, nil
 }
 

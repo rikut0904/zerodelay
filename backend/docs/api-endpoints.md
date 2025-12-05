@@ -61,11 +61,6 @@ POST /api/v1/auth/signup
 **レスポンス:**
 ```json
 {
-  "idToken": "eyJhbGciOiJSUzI1NiIs...",
-  "email": "user@example.com",
-  "refreshToken": "AMf-vBxT...",
-  "expiresIn": "3600",
-  "localId": "firebase_uid_here",
   "user": {
     "id": 1,
     "firebase_uid": "firebase_uid_here",
@@ -81,8 +76,10 @@ POST /api/v1/auth/signup
 
 **重要:**
 - サインアップ後、登録したメールアドレスに確認メールが送信されます
-- メールアドレス確認が完了するまで、ログインや他のAPIの利用はできません
+- **メールアドレス確認が完了するまで、ログインや他のAPIの利用はできません**
 - 確認メール内のリンクをクリックして、メールアドレスを確認してください
+- **確認完了後、`POST /api/v1/auth/login` でログインしてidTokenを取得してください**
+- サインアップ時にはidTokenは返されません（セキュリティ上の理由）
 
 ---
 
@@ -105,11 +102,8 @@ POST /api/v1/auth/login
 ```json
 {
   "idToken": "eyJhbGciOiJSUzI1NiIs...",
-  "email": "user@example.com",
   "refreshToken": "AMf-vBxT...",
   "expiresIn": "3600",
-  "localId": "firebase_uid_here",
-  "registered": true,
   "user": {
     "id": 1,
     "firebase_uid": "firebase_uid_here",
