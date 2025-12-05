@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
-import MapView from "@/components/MapView";
+import dynamic from "next/dynamic";
+const MapView = dynamic(() => import("@/components/MapView"), { ssr: false });
 
 export default function Home() {
   const [alertText, setAlertText] = useState("警報情報を取得中...");
@@ -14,7 +15,12 @@ export default function Home() {
   const [currentPos, setCurrentPos] = useState<[number, number] | null>(null);
 
   useEffect(() => {
-    const checkWidth = () => setIsMobile(window.innerWidth < 768);
+    if (typeof window === "undefined") return;
+
+    const checkWidth = () =>{
+      setIsMobile(window.innerWidth < 768);
+    };
+
     checkWidth();
     window.addEventListener("resize", checkWidth);
     return () => window.removeEventListener("resize", checkWidth);
