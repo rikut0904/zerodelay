@@ -49,7 +49,13 @@ export default function MapView({
   useEffect(() => {
     if (typeof window === "undefined") return;
     const saved = localStorage.getItem("regionSetting");
-    if (saved) setRegion(JSON.parse(saved));
+    if (!saved) return;
+    try {
+      setRegion(JSON.parse(saved));
+    } catch (error) {
+      console.error("Failed to parse regionSetting from localStorage", error);
+      localStorage.removeItem("regionSetting");
+    }
   }, []);
 
   useEffect(() => {

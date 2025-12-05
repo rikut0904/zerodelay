@@ -25,15 +25,27 @@ export default function SettingPage() {
     const savedFontSize = localStorage.getItem("fontSize");
     const savedRegion = localStorage.getItem("regionSetting");
 
-    if (savedLayers) setMapLayers(JSON.parse(savedLayers));
+    if (savedLayers) {
+      try {
+        setMapLayers(JSON.parse(savedLayers));
+      } catch (error) {
+        console.error("Failed to parse mapLayers from localStorage", error);
+        localStorage.removeItem("mapLayers");
+      }
+    }
 
     if (savedFontSize) {
-      const parsedFont = JSON.parse(savedFontSize);
-      setFontSize(parsedFont);
-      document.documentElement.style.setProperty(
-        "--app-font-size",
-        fontSizeMap[parsedFont]
-      );
+      try {
+        const parsedFont = JSON.parse(savedFontSize);
+        setFontSize(parsedFont);
+        document.documentElement.style.setProperty(
+          "--app-font-size",
+          fontSizeMap[parsedFont]
+        );
+      } catch (error) {
+        console.error("Failed to parse fontSize from localStorage", error);
+        localStorage.removeItem("fontSize");
+      }
     } else {
       localStorage.setItem("fontSize", JSON.stringify("medium"));
       document.documentElement.style.setProperty(
@@ -42,7 +54,14 @@ export default function SettingPage() {
       );
     }
 
-    if (savedRegion) setRegionSetting(JSON.parse(savedRegion));
+    if (savedRegion) {
+      try {
+        setRegionSetting(JSON.parse(savedRegion));
+      } catch (error) {
+        console.error("Failed to parse regionSetting from localStorage", error);
+        localStorage.removeItem("regionSetting");
+      }
+    }
   }, []);
 
   const autoSave = (key: string, value: any, extraEffect?: () => void) => {
