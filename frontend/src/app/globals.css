@@ -1,3 +1,5 @@
+@import "leaflet/dist/leaflet.css";
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -10,25 +12,14 @@ body {
   overflow-x: hidden;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+
+  /* フォント＆ボタンのデフォルトサイズ */
+  --app-font-size: 16px;
+  --button-padding: 10px 20px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -36,5 +27,43 @@ a {
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  font-size: var(--app-font-size);
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+  transition: font-size 0.2s ease;
+}
+
+/* タブレット以上（画面幅768px〜） */
+@media (min-width: 768px) {
+  :root {
+    --app-font-size: 17px;
+    --button-padding: 11px 22px;
+  }
+}
+
+/* PC以上（画面幅1024px〜） */
+@media (min-width: 1024px) {
+  :root {
+    --app-font-size: 18px;
+    --button-padding: 12px 24px;
+  }
+}
+
+/* スマホ（幅768px未満）では下のナビゲーションを隠す */
+@media (max-width: 767px) {
+  [style*="nav"] {
+    display: none !important;
+  }
+  [style*="menuIcon"] {
+    display: block !important;
   }
 }
