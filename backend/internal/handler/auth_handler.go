@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -20,12 +21,14 @@ func NewAuthHandler(authService *service.AuthService) *AuthHandler {
 func (h *AuthHandler) SignUp(c echo.Context) error {
 	var req model.SignUpRequest
 	if err := c.Bind(&req); err != nil {
+		log.Printf("[WARN] SignUp bind failed: %v", err)
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
 	}
 
 	resp, err := h.authService.SignUp(c.Request().Context(), &req)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		log.Printf("[ERROR] SignUp failed: %v", err)
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "ユーザー登録に失敗しました"})
 	}
 
 	return c.JSON(http.StatusOK, resp)
@@ -34,12 +37,14 @@ func (h *AuthHandler) SignUp(c echo.Context) error {
 func (h *AuthHandler) Login(c echo.Context) error {
 	var req model.LoginRequest
 	if err := c.Bind(&req); err != nil {
+		log.Printf("[WARN] Login bind failed: %v", err)
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
 	}
 
 	resp, err := h.authService.Login(c.Request().Context(), &req)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		log.Printf("[ERROR] Login failed: %v", err)
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "ログインに失敗しました"})
 	}
 
 	return c.JSON(http.StatusOK, resp)

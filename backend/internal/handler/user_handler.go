@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -24,11 +25,13 @@ func NewUserHandler(userService *service.UserService) *UserHandler {
 func (h *UserHandler) CreateUser(c echo.Context) error {
 	var user model.User
 	if err := c.Bind(&user); err != nil {
+		log.Printf("[WARN] CreateUser bind failed: %v", err)
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
 	}
 
 	if err := h.userService.CreateUser(&user); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		log.Printf("[ERROR] CreateUser failed: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "ユーザーの作成に失敗しました"})
 	}
 
 	return c.JSON(http.StatusCreated, user)
@@ -53,7 +56,8 @@ func (h *UserHandler) GetUser(c echo.Context) error {
 func (h *UserHandler) GetAllUsers(c echo.Context) error {
 	users, err := h.userService.GetAllUsers()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		log.Printf("[ERROR] GetAllUsers failed: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "ユーザーの取得に失敗しました"})
 	}
 
 	return c.JSON(http.StatusOK, users)
@@ -68,12 +72,14 @@ func (h *UserHandler) UpdateUser(c echo.Context) error {
 
 	var user model.User
 	if err := c.Bind(&user); err != nil {
+		log.Printf("[WARN] UpdateUser bind failed: %v", err)
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
 	}
 	user.ID = uint(id)
 
 	if err := h.userService.UpdateUser(&user); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		log.Printf("[ERROR] UpdateUser failed: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "ユーザーの更新に失敗しました"})
 	}
 
 	return c.JSON(http.StatusOK, user)
@@ -87,7 +93,8 @@ func (h *UserHandler) DeleteUser(c echo.Context) error {
 	}
 
 	if err := h.userService.DeleteUser(uint(id)); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		log.Printf("[ERROR] DeleteUser failed: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "ユーザーの削除に失敗しました"})
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "User deleted successfully"})
@@ -108,12 +115,14 @@ func (h *UserHandler) UpdateProfile(c echo.Context) error {
 
 	var req model.UpdateProfileRequest
 	if err := c.Bind(&req); err != nil {
+		log.Printf("[WARN] UpdateProfile bind failed for UID %s: %v", firebaseUID, err)
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
 	}
 
 	user, err := h.userService.UpdateProfile(c.Request().Context(), firebaseUID, &req)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		log.Printf("[ERROR] UpdateProfile failed for UID %s: %v", firebaseUID, err)
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "プロフィールの更新に失敗しました"})
 	}
 
 	return c.JSON(http.StatusOK, user)
