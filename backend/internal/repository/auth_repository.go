@@ -196,7 +196,11 @@ func (r *authRepository) SendEmailVerification(ctx context.Context, idToken stri
 	}
 	defer resp.Body.Close()
 
-	respBody, _ := io.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("[ERROR] Failed to read email verification response: %v", err)
+		return fmt.Errorf("failed to read email verification response: %w", err)
+	}
 
 	if resp.StatusCode != http.StatusOK {
 		log.Printf("[ERROR] Email verification failed with status %d: %s", resp.StatusCode, string(respBody))
