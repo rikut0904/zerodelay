@@ -1,3 +1,5 @@
 .env
 .claude
 serviceAccountKey.json
+cmd/debug/
+cmd/debug/README.md
