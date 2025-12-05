@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"zerodelay/internal/domain/model"
 	"zerodelay/internal/domain/repository"
@@ -43,7 +44,7 @@ func (s *AuthService) SignUp(ctx context.Context, req *model.SignUpRequest) (*mo
 	if err := s.userRepo.Create(user); err != nil {
 		// PostgreSQL保存失敗時もFirebaseユーザーは作成済み
 		// ログを出力してエラーを返す
-		return nil, errors.New("failed to create user in database: " + err.Error())
+		return nil, fmt.Errorf("failed to create user in database: %w", err)
 	}
 
 	// 4. レスポンスにユーザー情報を追加

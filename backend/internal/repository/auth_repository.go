@@ -26,6 +26,7 @@ type authRepository struct {
 	firebaseAuth *fbauth.Client
 	apiKey       string
 	baseURL      string
+	httpClient   *http.Client
 }
 
 func NewAuthRepository(firebaseAuth *fbauth.Client) *authRepository {
@@ -38,6 +39,7 @@ func NewAuthRepository(firebaseAuth *fbauth.Client) *authRepository {
 		firebaseAuth: firebaseAuth,
 		apiKey:       apiKey,
 		baseURL:      firebaseAuthBaseURL,
+		httpClient:   &http.Client{},
 	}
 }
 
@@ -56,8 +58,7 @@ func (r *authRepository) callFirebaseAuthAPI(ctx context.Context, endpoint strin
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := r.httpClient.Do(req)
 	if err != nil {
 		log.Printf("[ERROR] Failed to communicate with Firebase: %v", err)
 		return nil, fmt.Errorf("failed to communicate with Firebase: %w", err)

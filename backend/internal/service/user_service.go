@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"gorm.io/gorm"
 
@@ -93,7 +94,7 @@ func (s *UserService) UpdateProfile(ctx context.Context, firebaseUID string, req
 	// 3. Email更新時はFirebaseも同期
 	if req.Email != nil && *req.Email != user.Email {
 		if err := s.authRepo.UpdateEmail(ctx, firebaseUID, *req.Email); err != nil {
-			return nil, errors.New("failed to update email in Firebase: " + err.Error())
+			return nil, fmt.Errorf("failed to update email in Firebase: %w", err)
 		}
 		user.Email = *req.Email
 	}
@@ -112,7 +113,7 @@ func (s *UserService) UpdateProfile(ctx context.Context, firebaseUID string, req
 
 	// 5. PostgreSQLに保存
 	if err := s.userRepo.Update(user); err != nil {
-		return nil, errors.New("failed to update user: " + err.Error())
+		return nil, fmt.Errorf("failed to update user: %w", err)
 	}
 
 	return user, nil
