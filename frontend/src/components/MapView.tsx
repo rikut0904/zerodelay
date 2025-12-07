@@ -39,9 +39,11 @@ function MapInitializer({
 export default function MapView({
   onMapReady,
   onPositionChange,
+  hazardType,
 }: {
   onMapReady?: (map: any) => void;
   onPositionChange?: (pos: [number, number]) => void;
+  hazardType?: "flood" | "tsunami" | "landslide" | null;
 }) {
   const [position, setPosition] = useState<[number, number] | null>(null);
   const [region, setRegion] = useState("current");
@@ -119,6 +121,26 @@ export default function MapView({
       <MapInitializer onMapReady={onMapReady} />
       <ScaleControl position="bottomleft" imperial={false} />
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      
+      { hazardType === "flood" && (
+        <TileLayer
+          url="https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_data/{z}/{x}/{y}.png"
+          opacity={0.8}
+        />
+      )}
+      { hazardType === "tsunami" && (
+        <TileLayer
+          url="https://disaportaldata.gsi.go.jp/raster/04_tsunami_newlegend_pref_data/17/{z}/{x}/{y}.png"
+          opacity={0.8}
+        />
+      )}
+      { hazardType === "landslide" && (
+        <TileLayer
+          url="https://disaportaldata.gsi.go.jp/raster/05_dosekiryukeikaikuiki_data/17/{z}/{x}/{y}.png"
+          opacity={0.8}
+        />
+      )}
+      
       <Marker position={position}>
         <Popup>あなたの設定した地域</Popup>
       </Marker>
