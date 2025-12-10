@@ -122,21 +122,13 @@ export default function MapView({
       <ScaleControl position="bottomleft" imperial={false} />
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       
-      { hazardType === "flood" && (
+      {hazardType && (
         <TileLayer
-          url="https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_data/{z}/{x}/{y}.png"
-          opacity={0.8}
-        />
-      )}
-      { hazardType === "tsunami" && (
-        <TileLayer
-          url="https://disaportaldata.gsi.go.jp/raster/04_tsunami_newlegend_pref_data/17/{z}/{x}/{y}.png"
-          opacity={0.8}
-        />
-      )}
-      { hazardType === "landslide" && (
-        <TileLayer
-          url="https://disaportaldata.gsi.go.jp/raster/05_dosekiryukeikaikuiki_data/17/{z}/{x}/{y}.png"
+          url={{
+            flood: "https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_data/{z}/{x}/{y}.png",
+            tsunami: "https://disaportaldata.gsi.go.jp/raster/04_tsunami_newlegend_pref_data/17/{z}/{x}/{y}.png",
+            landslide: "https://disaportaldata.gsi.go.jp/raster/05_dosekiryukeikaikuiki_data/17/{z}/{x}/{y}.png",
+          }[hazardType]}
           opacity={0.8}
         />
       )}

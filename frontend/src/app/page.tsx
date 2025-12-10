@@ -14,6 +14,10 @@ export default function Home() {
   const [currentPos, setCurrentPos] = useState<[number, number] | null>(null);
   const [hazardType, setHazardType] = useState<"flood" | "tsunami" |"landslide" | null>(null);
 
+  const toggleHazardType = (type: "flood" | "tsunami" | "landslide") => {
+    setHazardType((current) => (current === type ? null : type));
+  };
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const checkWidth = () => setIsMobile(window.innerWidth < 768);
@@ -65,9 +69,9 @@ export default function Home() {
       )}
 
       <div style={styles.buttons}>
-        <button style={styles.button} onClick={() => setHazardType("flood")}>洪水</button>
-        <button style={styles.button} onClick={() => setHazardType("tsunami")}>津波</button>
-        <button style={styles.button} onClick={() => setHazardType("landslide")}>土砂</button>
+        <button style={styles.button} onClick={() => setHazardType(hazardType === "flood" ? null : "flood")}>洪水</button>
+        <button style={styles.button} onClick={() => setHazardType(hazardType === "tsunami" ? null : "tsunami")}>津波</button>
+        <button style={styles.button} onClick={() => setHazardType(hazardType === "landslide" ? null : "landslide")}>土砂</button>
       </div>
 
       <div style={styles.mapArea}>
