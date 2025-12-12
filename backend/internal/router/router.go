@@ -64,14 +64,7 @@ func SetupRoutes(
 func buildCORSConfig() middleware.CORSConfig {
 	allowedOrigins := []string{"http://localhost:3000"}
 	if raw := strings.TrimSpace(os.Getenv("CORS_ALLOWED_ORIGINS")); raw != "" {
-		parts := strings.Split(raw, ",")
-		var origins []string
-		for _, p := range parts {
-			if trimmed := strings.TrimSpace(p); trimmed != "" {
-				origins = append(origins, trimmed)
-			}
-		}
-		if len(origins) > 0 {
+		if origins := filterSplit(raw); len(origins) > 0 {
 			allowedOrigins = origins
 		}
 	}
@@ -83,4 +76,15 @@ func buildCORSConfig() middleware.CORSConfig {
 		ExposeHeaders:    []string{echo.HeaderAuthorization},
 		AllowCredentials: true,
 	}
+}
+
+func filterSplit(raw string) []string {
+	parts := strings.Split(raw, ",")
+	result := make([]string, 0, len(parts))
+	for _, p := range parts {
+		if trimmed := strings.TrimSpace(p); trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	return result
 }
