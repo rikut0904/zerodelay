@@ -1,14 +1,28 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import styles from "../AuthForm.module.css";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 
-export default function SigninPage() {
+function SigninPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTarget = useMemo(() => {
+    const raw = searchParams.get("redirect_url");
+    if (!raw || !raw.startsWith("/")) {
+      return null;
+    }
+    const url = new URL(raw, "http://localhost");
+    return url.pathname + url.search + url.hash;
+  }, [searchParams]);
+  const loginLink = redirectTarget
+    ? `/setting/login?redirect_url=${encodeURIComponent(redirectTarget)}`
+    : "/setting/login";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -43,7 +57,7 @@ export default function SigninPage() {
 
       await response.json();
       setInfo(
-        "登録メールアドレス宛に確認メールを送信しました。確認完了後にログインしてください。"
+        "登録メールアドレス宛に確認メールを送信しました。確認完了後にログインしてください。10秒後にログイン画面へ移動します。"
       );
       setEmail("");
       setPassword("");
@@ -64,6 +78,14 @@ export default function SigninPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!info) return;
+    const timer = setTimeout(() => {
+      router.push(loginLink);
+    }, 10000);
+    return () => clearTimeout(timer);
+  }, [info, loginLink, router]);
 
   return (
     <div className={styles.pageWrapper}>
@@ -125,13 +147,21 @@ export default function SigninPage() {
 
         <p className={styles.helperText}>
           既にアカウントをお持ちの場合は{" "}
-          <Link href="/setting/login" className={styles.link}>
+          <Link href={loginLink} className={styles.link}>
             ログイン
           </Link>
           へ
         </p>
       </div>
     </div>
+  );
+}
+
+export default function SigninPage() {
+  return (
+    <Suspense fallback={<div />}>
+      <SigninPageContent />
+    </Suspense>
   );
 }
 

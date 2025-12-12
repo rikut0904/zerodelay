@@ -1,16 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import styles from "../AuthForm.module.css";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTarget = useMemo(() => {
+    const raw = searchParams.get("redirect_url");
+    if (!raw || !raw.startsWith("/")) {
+      return null;
+    }
+    const url = new URL(raw, "http://localhost");
+    return url.pathname + url.search + url.hash;
+  }, [searchParams]);
+  const redirectQuery = redirectTarget
+    ? `?redirect_url=${encodeURIComponent(redirectTarget)}`
+    : "";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -47,7 +59,8 @@ export default function LoginPage() {
       await response.json().catch(() => undefined);
 
       setInfo("ログインに成功しました。画面を遷移します。");
-      router.push("/");
+      const destination = redirectTarget ?? "/";
+      router.push(destination);
     } catch (err) {
       if (err instanceof Error) {
         if (err.message === "Failed to fetch") {
@@ -120,13 +133,24 @@ export default function LoginPage() {
 
         <p className={styles.helperText}>
           アカウントをお持ちでない場合は{" "}
-          <Link href="/setting/signin" className={styles.link}>
+          <Link
+            href={`/setting/signin${redirectQuery}`}
+            className={styles.link}
+          >
             新規登録
           </Link>
           へ
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div />}>
+      <LoginPageContent />
+    </Suspense>
   );
 }
 
