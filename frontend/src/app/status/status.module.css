@@ -1,0 +1,75 @@
+.container {
+  padding: 2rem;
+  font-family: system-ui, sans-serif;
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgba(var(--background-end-rgb), 0.8)
+    ),
+    rgb(var(--background-start-rgb));
+  min-height: 100vh;
+}
+
+.section {
+  margin-top: 2rem;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.apiList {
+  list-style: none;
+  padding: 0;
+  margin-top: 1rem;
+}
+
+.apiItem {
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(var(--foreground-rgb), 0.15);
+  background-color: rgba(var(--background-end-rgb), 0.8);
+  box-shadow: 0 5px 15px rgba(15, 23, 42, 0.08);
+}
+
+.apiOk {
+  border-color: rgba(52, 211, 153, 0.8);
+  background-color: rgba(236, 253, 245, 0.8);
+}
+
+.apiError {
+  border-color: rgba(248, 113, 113, 0.8);
+  background-color: rgba(254, 242, 242, 0.8);
+}
+
+.apiStatus {
+  margin: 0.25rem 0;
+}
+
+.apiDetails {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(var(--foreground-rgb), 0.7);
+}
+
+.apiInfo {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #2563eb;
+}
+
+.apiNote {
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(var(--foreground-rgb), 0.6);
+}
+
+.footer {
+  margin-top: 2rem;
+  font-size: 0.875rem;
+  color: rgba(var(--foreground-rgb), 0.65);
+}
