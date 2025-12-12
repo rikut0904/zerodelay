@@ -33,12 +33,9 @@ body {
 body {
   font-size: var(--app-font-size);
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
+  background: linear-gradient(to bottom,
       transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+      rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
   transition: font-size 0.2s ease;
 }
 
@@ -63,6 +60,7 @@ body {
   [style*="nav"] {
     display: none !important;
   }
+
   [style*="menuIcon"] {
     display: block !important;
   }

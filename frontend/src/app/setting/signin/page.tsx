@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import type { CSSProperties, FormEvent } from "react";
+import type { FormEvent } from "react";
 import { useState } from "react";
+import styles from "../AuthForm.module.css";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
@@ -54,47 +55,44 @@ export default function SigninPage() {
   };
 
   return (
-    <div style={pageWrapperStyle}>
-      <div style={cardStyle}>
-        <h1 style={{ marginBottom: "0.5rem", fontSize: "1.5rem" }}>新規登録</h1>
-        <p style={{ marginBottom: "1.5rem", color: "#4b5563", fontSize: "0.95rem" }}>
+    <div className={styles.pageWrapper}>
+      <div className={styles.card}>
+        <h1 className={styles.title}>新規登録</h1>
+        <p className={styles.description}>
           メールアドレスとパスワードを入力し、認証メールから登録を完了してください。
         </p>
 
-        <form
-          onSubmit={handleSignup}
-          style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-        >
-          <label style={labelStyle}>
+        <form onSubmit={handleSignup} className={styles.form}>
+          <label className={styles.label}>
             メールアドレス
             <input
               type="email"
               value={email}
               required
               onChange={(event) => setEmail(event.target.value)}
-              style={inputStyle}
+              className={styles.input}
               placeholder="example@example.com"
               autoComplete="email"
             />
           </label>
 
-          <label style={labelStyle}>
+          <label className={styles.label}>
             パスワード
-            <div style={passwordWrapperStyle}>
+            <div className={styles.passwordWrapper}>
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
                 required
                 minLength={8}
                 onChange={(event) => setPassword(event.target.value)}
-                style={{ ...inputStyle, paddingRight: "2.75rem" }}
+                className={`${styles.input} ${styles.inputWithToggle}`}
                 placeholder="8文字以上"
                 autoComplete="new-password"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                style={toggleButtonStyle}
+                className={styles.toggleButton}
                 aria-label={showPassword ? "パスワードを隠す" : "パスワードを表示"}
               >
                 <span className="material-symbols-outlined" aria-hidden="true">
@@ -104,21 +102,19 @@ export default function SigninPage() {
             </div>
           </label>
 
-          <p style={{ margin: 0, color: "#6b7280", fontSize: "0.85rem" }}>
-            登録完了後はログインページからサインインできます。
-          </p>
+          <p className={styles.helperNote}>登録完了後はログインページからサインインできます。</p>
 
-          <button type="submit" style={buttonStyle(loading)} disabled={loading}>
+          <button type="submit" className={styles.submitButton} disabled={loading}>
             {loading ? "送信中..." : "登録する"}
           </button>
         </form>
 
-        {error && <p style={{ ...messageStyle, color: "#dc2626" }}>{error}</p>}
-        {info && <p style={{ ...messageStyle, color: "#16a34a" }}>{info}</p>}
+        {error && <p className={`${styles.message} ${styles.error}`}>{error}</p>}
+        {info && <p className={`${styles.message} ${styles.info}`}>{info}</p>}
 
-        <p style={{ marginTop: "1.5rem", fontSize: "0.9rem" }}>
+        <p className={styles.helperText}>
           既にアカウントをお持ちの場合は{" "}
-          <Link href="/setting/login" style={{ color: "#2563eb" }}>
+          <Link href="/setting/login" className={styles.link}>
             ログイン
           </Link>
           へ
@@ -127,80 +123,3 @@ export default function SigninPage() {
     </div>
   );
 }
-
-const pageWrapperStyle: CSSProperties = {
-  minHeight: "100vh",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  padding: "2rem",
-  background:
-    "radial-gradient(circle at top, rgba(37,99,235,0.15), transparent 40%), #f9fafb",
-};
-
-const cardStyle: CSSProperties = {
-  width: "100%",
-  maxWidth: "420px",
-  backgroundColor: "#ffffff",
-  borderRadius: "16px",
-  padding: "2rem",
-  boxShadow: "0 20px 45px rgba(15, 23, 42, 0.1)",
-};
-
-const labelStyle: CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  fontSize: "0.9rem",
-  color: "#374151",
-  fontWeight: 600,
-  gap: "0.4rem",
-};
-
-const inputStyle: CSSProperties = {
-  padding: "0.8rem 0.9rem",
-  borderRadius: "10px",
-  border: "1px solid #d1d5db",
-  fontSize: "0.95rem",
-  outline: "none",
-  transition: "border-color 0.2s, box-shadow 0.2s",
-};
-
-const buttonStyle = (disabled: boolean): CSSProperties => ({
-  marginTop: "0.5rem",
-  padding: "0.9rem",
-  borderRadius: "999px",
-  border: "none",
-  background:
-    "linear-gradient(120deg, rgba(59,130,246,1) 0%, rgba(37,99,235,1) 100%)",
-  color: "#ffffff",
-  fontWeight: 700,
-  fontSize: "1rem",
-  cursor: disabled ? "not-allowed" : "pointer",
-  transition: "opacity 0.2s",
-  opacity: disabled ? 0.6 : 1,
-});
-
-const messageStyle: CSSProperties = {
-  marginTop: "1rem",
-  fontSize: "0.9rem",
-};
-
-const passwordWrapperStyle: CSSProperties = {
-  position: "relative",
-  display: "flex",
-  alignItems: "center",
-};
-
-const toggleButtonStyle: CSSProperties = {
-  position: "absolute",
-  right: "0.65rem",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  padding: "0.15rem",
-  background: "transparent",
-  border: "none",
-  cursor: "pointer",
-  lineHeight: 1,
-  color: "#4b5563",
-};
