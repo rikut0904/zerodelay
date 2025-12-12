@@ -116,7 +116,7 @@ export default function MapView({
   }
 
   return (
-    <MapContainer center={position} zoom={17} style={{ height: "100%", width: "100%" }}>
+    <MapContainer center={position} zoom={17} maxZoom={18} style={{ height: "100%", width: "100%" }}>
       <SetCenter position={position} />
       <MapInitializer onMapReady={onMapReady} />
       <ScaleControl position="bottomleft" imperial={false} />
@@ -129,7 +129,9 @@ export default function MapView({
             tsunami: "https://disaportaldata.gsi.go.jp/raster/04_tsunami_newlegend_pref_data/17/{z}/{x}/{y}.png",
             landslide: "https://disaportaldata.gsi.go.jp/raster/05_dosekiryukeikaikuiki_data/17/{z}/{x}/{y}.png",
           }[hazardType]}
-          opacity={0.8}
+          opacity={0.55}
+          maxNativeZoom={17}
+          maxZoom={18}
         />
       )}
       
