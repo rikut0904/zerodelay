@@ -42,6 +42,13 @@ const apiChecks: ApiCheck[] = [
     acceptableStatuses: [204],
   },
   {
+    name: "認証API (ログアウト)",
+    path: "/api/v1/auth/logout",
+    method: "OPTIONS",
+    acceptableStatuses: [204],
+    description: "ログアウトエンドポイントのプリフライト結果を確認します。",
+  },
+  {
     name: "ユーザー一覧取得",
     path: "/api/v1/users",
     acceptableStatuses: [200, 401],
@@ -56,6 +63,25 @@ const apiChecks: ApiCheck[] = [
   {
     name: "ユーザー作成 (OPTIONS)",
     path: "/api/v1/users",
+    method: "OPTIONS",
+    acceptableStatuses: [204],
+    description: "POST /users のプリフライトを確認します。",
+  },
+  {
+    name: "ユーザー更新 (OPTIONS)",
+    path: "/api/v1/users/1",
+    method: "OPTIONS",
+    acceptableStatuses: [204],
+  },
+  {
+    name: "ユーザー削除 (OPTIONS)",
+    path: "/api/v1/users/1",
+    method: "OPTIONS",
+    acceptableStatuses: [204],
+  },
+  {
+    name: "ユーザープロフィール更新 (OPTIONS)",
+    path: "/api/v1/users/me",
     method: "OPTIONS",
     acceptableStatuses: [204],
   },
@@ -73,6 +99,18 @@ const apiChecks: ApiCheck[] = [
   {
     name: "プレース作成 (OPTIONS)",
     path: "/api/v1/places",
+    method: "OPTIONS",
+    acceptableStatuses: [204],
+  },
+  {
+    name: "プレース更新 (OPTIONS)",
+    path: "/api/v1/places/1",
+    method: "OPTIONS",
+    acceptableStatuses: [204],
+  },
+  {
+    name: "プレース削除 (OPTIONS)",
+    path: "/api/v1/places/1",
     method: "OPTIONS",
     acceptableStatuses: [204],
   },
