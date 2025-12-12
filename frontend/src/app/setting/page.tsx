@@ -18,6 +18,8 @@ export default function SettingPage() {
     土砂危険エリア: false,
   });
   const [fontSize, setFontSize] = useState<string>("medium");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -25,6 +27,8 @@ export default function SettingPage() {
     const savedLayers = localStorage.getItem("mapLayers");
     const savedFontSize = localStorage.getItem("fontSize");
     const savedRegion = localStorage.getItem("regionSetting");
+    const token = localStorage.getItem("idToken"); // 仮の認証判定。実装に合わせてキーを変更してください。
+    const savedUser = localStorage.getItem("userName");
 
     if (savedLayers) {
       try {
@@ -63,6 +67,15 @@ export default function SettingPage() {
         localStorage.removeItem("regionSetting");
       }
     }
+
+    if (token) setIsLoggedIn(true);
+    if (savedUser) {
+      try {
+        setUserName(JSON.parse(savedUser));
+      } catch {
+        setUserName(savedUser);
+      }
+    }
   }, []);
 
   const autoSave = (key: string, value: any, extraEffect?: () => void) => {
@@ -73,6 +86,34 @@ export default function SettingPage() {
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>⚙️ 設定</h1>
+
+      <section style={styles.section}>
+        <h2 style={styles.subtitle}>👤 アカウント</h2>
+        {isLoggedIn ? (
+          <div style={styles.accountBox}>
+            <p style={{ margin: 0, fontSize: "var(--app-font-size)" }}>
+              {userName ? `${userName} さん、こんにちは` : "こんにちは"}
+            </p>
+            <Link href="/setting/logout?redirect_url=/setting" style={styles.authButton}>
+              ログアウトへ
+            </Link>
+          </div>
+        ) : (
+          <div style={styles.accountBox}>
+            <p style={{ margin: "0 0 8px", fontSize: "var(--app-font-size)" }}>
+              ログインしていません
+            </p>
+            <div style={{ display: "flex", gap: 12 }}>
+              <Link href="/setting/login?redirect_url=/setting" style={styles.authButton}>
+                ログイン
+              </Link>
+              <Link href="/setting/signin?redirect_url=/setting" style={styles.authButtonSecondary}>
+                新規登録
+              </Link>
+            </div>
+          </div>
+        )}
+      </section>
 
       <section style={styles.section}>
         <button style={styles.itemButton} onClick={() => setOpenModal("region")}>
@@ -222,6 +263,13 @@ const styles: Record<string, React.CSSProperties> = {
   subtitle: {
     fontSize: 18,
   },
+  accountBox: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    flexWrap: "wrap",
+  },
   form: {
     display: "flex",
     flexDirection: "column",
@@ -275,6 +323,26 @@ const styles: Record<string, React.CSSProperties> = {
   link: {
     textDecoration: "none",
     color: "black",
+    fontSize: "var(--app-font-size)",
+  },
+  authButton: {
+    display: "inline-block",
+    padding: "10px 16px",
+    borderRadius: 8,
+    background: "#2563eb",
+    color: "#fff",
+    textDecoration: "none",
+    fontWeight: 600,
+    fontSize: "var(--app-font-size)",
+  },
+  authButtonSecondary: {
+    display: "inline-block",
+    padding: "10px 16px",
+    borderRadius: 8,
+    background: "#e5e7eb",
+    color: "#111",
+    textDecoration: "none",
+    fontWeight: 600,
     fontSize: "var(--app-font-size)",
   },
 };
