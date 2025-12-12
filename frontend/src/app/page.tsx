@@ -69,9 +69,9 @@ export default function Home() {
       )}
 
       <div style={styles.buttons}>
-        <button style={styles.button} onClick={() => setHazardType(hazardType === "flood" ? null : "flood")}>洪水</button>
-        <button style={styles.button} onClick={() => setHazardType(hazardType === "tsunami" ? null : "tsunami")}>津波</button>
-        <button style={styles.button} onClick={() => setHazardType(hazardType === "landslide" ? null : "landslide")}>土砂</button>
+        <button style={styles.button} onClick={() => toggleHazardType("flood")}>洪水</button>
+        <button style={styles.button} onClick={() => toggleHazardType("tsunami")}>津波</button>
+        <button style={styles.button} onClick={() => toggleHazardType("landslide")}>土砂</button>
       </div>
 
       <div style={styles.mapArea}>
