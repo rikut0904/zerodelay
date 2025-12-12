@@ -27,6 +27,7 @@ export default function LoginPage() {
       const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // 認証APIからのHttpOnlyクッキーを保持
         body: JSON.stringify({ email, password }),
       });
 
@@ -39,17 +40,7 @@ export default function LoginPage() {
         throw new Error(message);
       }
 
-      const data = await response.json();
-
-      if (typeof window !== "undefined") {
-        if (data.idToken) {
-          localStorage.setItem("idToken", data.idToken);
-        }
-        if (data.refreshToken) {
-          localStorage.setItem("refreshToken", data.refreshToken);
-        }
-        localStorage.setItem("userEmail", email);
-      }
+      await response.json().catch(() => undefined);
 
       setInfo("ログインに成功しました。画面を遷移します。");
       router.push("/");
