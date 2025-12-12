@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { FormEvent } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { Suspense, useMemo, useState } from "react";
 import styles from "../AuthForm.module.css";
 
@@ -116,9 +117,7 @@ function LoginPageContent() {
                 className={styles.toggleButton}
                 aria-label={showPassword ? "パスワードを隠す" : "パスワードを表示"}
               >
-                <span className="material-symbols-outlined" aria-hidden="true">
-                  {showPassword ? "visibility_off" : "visibility"}
-                </span>
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
           </label>
