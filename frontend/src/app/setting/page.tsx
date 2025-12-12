@@ -20,6 +20,8 @@ export default function SettingPage() {
   const [fontSize, setFontSize] = useState<string>("medium");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [infoMessage, setInfoMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -78,6 +80,15 @@ export default function SettingPage() {
     }
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("idToken");
+    localStorage.removeItem("userName");
+    setIsLoggedIn(false);
+    setUserName(null);
+    setInfoMessage("ログアウトしました");
+    setShowLogoutConfirm(false);
+  };
+
   const autoSave = (key: string, value: any, extraEffect?: () => void) => {
     localStorage.setItem(key, JSON.stringify(value));
     if (extraEffect) extraEffect();
@@ -94,9 +105,13 @@ export default function SettingPage() {
             <p style={{ margin: 0, fontSize: "var(--app-font-size)" }}>
               {userName ? `${userName} さん、こんにちは` : "こんにちは"}
             </p>
-            <Link href="/setting/logout?redirect_url=/setting" style={styles.authButton}>
-              ログアウトへ
-            </Link>
+            <button
+              type="button"
+              style={styles.authButton}
+              onClick={() => setShowLogoutConfirm(true)}
+            >
+              ログアウト
+            </button>
           </div>
         ) : (
           <div style={styles.accountBox}>
@@ -112,6 +127,11 @@ export default function SettingPage() {
               </Link>
             </div>
           </div>
+        )}
+        {infoMessage && (
+          <p style={{ margin: "12px 0 0", color: "#047857", fontWeight: 600 }}>
+            {infoMessage}
+          </p>
         )}
       </section>
 
@@ -221,6 +241,24 @@ export default function SettingPage() {
               {size === "small" ? "小" : size === "medium" ? "中" : "大"}
             </label>
           ))}
+        </Modal>
+      )}
+
+      {showLogoutConfirm && (
+        <Modal title="ログアウト確認" onClose={() => setShowLogoutConfirm(false)}>
+          <p style={{ marginBottom: 16 }}>ログアウトしますか？</p>
+          <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+            <button
+              type="button"
+              style={styles.authButtonSecondary}
+              onClick={() => setShowLogoutConfirm(false)}
+            >
+              いいえ
+            </button>
+            <button type="button" style={styles.authButton} onClick={handleLogout}>
+              はい
+            </button>
+          </div>
         </Modal>
       )}
 
