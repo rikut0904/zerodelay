@@ -20,6 +20,11 @@ body {
   /* フォント＆ボタンのデフォルトサイズ */
   --app-font-size: 16px;
   --button-padding: 10px 20px;
+
+  --color-bg: #f9f9f9;
+  --color-bg-section: #fafafa;
+  --color-bg-card: #ffffff;
+  --color-text: #000000;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -27,6 +32,11 @@ body {
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
+
+    --color-bg: #111111;
+    --color-bg-section: #1a1a1a;
+    --color-bg-card: #222222;
+    --color-text: #ffffff;
   }
 }
 

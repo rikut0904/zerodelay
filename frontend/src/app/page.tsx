@@ -12,6 +12,11 @@ export default function Home() {
   const [isMobile, setIsMobile] = useState(false);
   const [map, setMap] = useState<any>(null);
   const [currentPos, setCurrentPos] = useState<[number, number] | null>(null);
+  const [hazardType, setHazardType] = useState<"flood" | "tsunami" |"landslide" | null>(null);
+
+  const toggleHazardType = (type: "flood" | "tsunami" | "landslide") => {
+    setHazardType((current) => (current === type ? null : type));
+  };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -64,13 +69,13 @@ export default function Home() {
       )}
 
       <div style={styles.buttons}>
-        <button style={styles.button}>洪水</button>
-        <button style={styles.button}>津波</button>
-        <button style={styles.button}>地震</button>
+        <button style={styles.button} onClick={() => setHazardType(hazardType === "flood" ? null : "flood")}>洪水</button>
+        <button style={styles.button} onClick={() => setHazardType(hazardType === "tsunami" ? null : "tsunami")}>津波</button>
+        <button style={styles.button} onClick={() => setHazardType(hazardType === "landslide" ? null : "landslide")}>土砂</button>
       </div>
 
       <div style={styles.mapArea}>
-        <MapView onMapReady={setMap} onPositionChange={setCurrentPos} />
+        <MapView onMapReady={setMap} onPositionChange={setCurrentPos} hazardType={hazardType} />
 
         <button
           onClick={returnToCurrentLocation}

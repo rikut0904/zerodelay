@@ -201,7 +201,8 @@ export default function SettingPage() {
 const styles: Record<string, React.CSSProperties> = {
   container: {
     padding: "60px 20px 80px",
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "var(--color-bg)",
+    color: "var(--color-text)",
     minHeight: "100vh",
     fontFamily: "sans-serif",
   },
@@ -211,9 +212,9 @@ const styles: Record<string, React.CSSProperties> = {
   },
   section: {
     padding: 12,
-    border: "1px solid #ddd",
+    border: "1px solid var(--color-bg-card)",
     borderRadius: 12,
-    background: "#fafafa",
+    background: "var(--color-bg-card)",
     marginBottom: 32,
     display: "flex",
     flexDirection: "column",
@@ -247,15 +248,17 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: "var(--app-font-size)",
     padding: "14px 16px",
     borderRadius: 8,
-    border: "1px solid #ccc",
-    background: "#fff",
+    border: "1px solid var(--color-bg-card)",
+    background: "var(--color-bg-section)",
     textAlign: "left",
     cursor: "pointer",
+    color: "var(--color-text)",
   },
   label: {
     fontSize: "var(--app-font-size)",
     margin: "6px 0",
     display: "block",
+    color: "var(--color-text)",
   },
   optionTitle: {
     fontSize: "1.1em",
@@ -268,13 +271,13 @@ const styles: Record<string, React.CSSProperties> = {
     width: "100%",
     display: "flex",
     justifyContent: "space-around",
-    backgroundColor: "#fff",
+    backgroundColor: "var(--color-bg-card)",
     padding: "10px 0",
-    borderTop: "1px solid #ccc",
+    borderTop: "1px solid var(--color-bg-section)",
   },
   link: {
     textDecoration: "none",
-    color: "black",
+    color: "var(--color-text)",
     fontSize: "var(--app-font-size)",
   },
 };
