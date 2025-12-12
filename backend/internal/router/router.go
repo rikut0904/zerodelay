@@ -62,10 +62,13 @@ func SetupRoutes(
 }
 
 func buildCORSConfig() middleware.CORSConfig {
-	allowedOrigins := []string{"http://localhost:3000"}
+	defaultOrigins := []string{"http://localhost:3000"}
+	allowedOrigins := defaultOrigins
 	if raw := strings.TrimSpace(os.Getenv("CORS_ALLOWED_ORIGINS")); raw != "" {
 		if origins := filterSplit(raw); len(origins) > 0 {
 			allowedOrigins = origins
+		} else {
+			allowedOrigins = defaultOrigins
 		}
 	}
 
