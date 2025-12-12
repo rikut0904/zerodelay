@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import styles from "./status.module.css";
 
 interface BackendResponse {
   message: string;
@@ -185,14 +186,14 @@ export default function StatusPage() {
   }, []);
 
   return (
-    <div style={{ padding: "2rem", fontFamily: "system-ui, sans-serif" }}>
+    <div className={styles.container}>
       <h1>ZeroDelay Application</h1>
-      <div style={{ marginTop: "2rem" }}>
-        <h2>Frontend Status</h2>
+      <div className={styles.section}>
+        <h2 className={styles.subtitle}>Frontend Status</h2>
         <p>✅ Next.js is running successfully!</p>
       </div>
-      <div style={{ marginTop: "2rem" }}>
-        <h2>Backend Status</h2>
+      <div className={styles.section}>
+        <h2 className={styles.subtitle}>Backend Status</h2>
         {loading && <p>Loading backend data...</p>}
         {error && <p style={{ color: "red" }}>❌ Error: {error}</p>}
         {backendMessage && (
@@ -202,36 +203,30 @@ export default function StatusPage() {
           </>
         )}
       </div>
-      <div style={{ marginTop: "2rem" }}>
-        <h2>API 稼働状況</h2>
-        <ul style={{ listStyle: "none", padding: 0, marginTop: "1rem" }}>
+      <div className={styles.section}>
+        <h2 className={styles.subtitle}>API 稼働状況</h2>
+        <ul className={styles.apiList}>
           {apiStatuses.map((api) => (
             <li
               key={api.name}
-              style={{
-                marginBottom: "0.75rem",
-                padding: "0.75rem",
-                borderRadius: "8px",
-                backgroundColor: api.status === "ok" ? "#ecfdf5" : "#fef2f2",
-                border: `1px solid ${api.status === "ok" ? "#34d399" : "#f87171"}`,
-              }}
+              className={`${styles.apiItem} ${api.status === "ok" ? styles.apiOk : styles.apiError}`}
             >
               <strong>{api.name}</strong>
-              <p style={{ margin: "0.25rem 0" }}>
+              <p className={styles.apiStatus}>
                 {api.status === "ok" ? "✅ 利用可能" : "❌ エラー"}
               </p>
-              <p style={{ margin: 0, fontSize: "0.9rem", color: "#374151" }}>{api.details}</p>
+              <p className={styles.apiDetails}>{api.details}</p>
               {api.info && (
-                <p style={{ margin: 0, fontSize: "0.85rem", color: "#2563eb" }}>{api.info}</p>
+                <p className={styles.apiInfo}>{api.info}</p>
               )}
               {api.note && (
-                <p style={{ margin: 0, fontSize: "0.8rem", color: "#6b7280" }}>{api.note}</p>
+                <p className={styles.apiNote}>{api.note}</p>
               )}
             </li>
           ))}
         </ul>
       </div>
-      <div style={{ marginTop: "2rem", fontSize: "0.875rem", color: "#666" }}>
+      <div className={styles.footer}>
         <p>
           Frontend running on port 3000
           <br />
