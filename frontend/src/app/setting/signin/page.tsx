@@ -31,15 +31,14 @@ export default function SigninPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        const fallback =
-          response.status >= 500
-            ? "サーバー側でエラーが発生しました。時間をおいて再度お試しください。"
-            : "入力内容をご確認のうえ、再度お試しください。";
-        const message =
+        const serverMessage =
           typeof data.error === "string" && data.error.length > 0
             ? data.error
-            : fallback;
-        throw new Error(`${message} (HTTP ${response.status})`);
+            : typeof data.message === "string" && data.message.length > 0
+              ? data.message
+              : "";
+        const message = mapSignupErrorMessage(serverMessage, response.status);
+        throw new Error(message);
       }
 
       await response.json();
@@ -134,4 +133,25 @@ export default function SigninPage() {
       </div>
     </div>
   );
+}
+
+function mapSignupErrorMessage(rawMessage: string, status: number): string {
+  const fallback =
+    status >= 500
+      ? "サーバー側でエラーが発生しました。時間をおいて再度お試しください。"
+      : "入力内容をご確認のうえ、再度お試しください。";
+  if (!rawMessage) {
+    return fallback;
+  }
+  const normalized = rawMessage.toLowerCase();
+  if (normalized.includes("email_exists")) {
+    return "このメールアドレスは既に登録されています。別のメールアドレスでお試しください。";
+  }
+  if (normalized.includes("weak_password")) {
+    return "パスワードが安全基準を満たしていません。より複雑なパスワードを設定してください。";
+  }
+  if (normalized.includes("invalid_email")) {
+    return "メールアドレスの形式が正しくありません。再度ご確認ください。";
+  }
+  return rawMessage;
 }

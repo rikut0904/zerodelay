@@ -40,12 +40,8 @@ export default function LoginPage() {
             : typeof data.message === "string" && data.message.length > 0
               ? data.message
               : "";
-        const fallback =
-          response.status >= 500
-            ? "サーバー側でエラーが発生しました。時間をおいて再度お試しください。"
-            : "メールアドレスまたはパスワードをご確認ください。";
-        const message = serverMessage || fallback;
-        throw new Error(`${message} (HTTP ${response.status})`);
+        const message = mapLoginErrorMessage(serverMessage, response.status);
+        throw new Error(message);
       }
 
       await response.json().catch(() => undefined);
@@ -132,4 +128,25 @@ export default function LoginPage() {
       </div>
     </div>
   );
+}
+
+function mapLoginErrorMessage(rawMessage: string, status: number): string {
+  const fallback =
+    status >= 500
+      ? "サーバー側でエラーが発生しました。時間をおいて再度お試しください。"
+      : "メールアドレスまたはパスワードが正しくありません。";
+  if (!rawMessage) {
+    return fallback;
+  }
+  const normalized = rawMessage.toLowerCase();
+  if (normalized.includes("invalid_login_credentials")) {
+    return "メールアドレスまたはパスワードが正しくありません。";
+  }
+  if (normalized.includes("user_disabled")) {
+    return "このアカウントは無効化されています。管理者にお問い合わせください。";
+  }
+  if (normalized.includes("too_many_attempts")) {
+    return "一定回数以上ログインに失敗しました。しばらく時間を置いてから再度お試しください。";
+  }
+  return rawMessage;
 }
