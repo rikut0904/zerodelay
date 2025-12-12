@@ -31,11 +31,15 @@ export default function SigninPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
+        const fallback =
+          response.status >= 500
+            ? "サーバー側でエラーが発生しました。時間をおいて再度お試しください。"
+            : "入力内容をご確認のうえ、再度お試しください。";
         const message =
           typeof data.error === "string" && data.error.length > 0
             ? data.error
-            : "新規登録に失敗しました。";
-        throw new Error(message);
+            : fallback;
+        throw new Error(`${message} (HTTP ${response.status})`);
       }
 
       await response.json();
@@ -46,9 +50,17 @@ export default function SigninPage() {
       setPassword("");
       setShowPassword(false);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "不明なエラーが発生しました。"
-      );
+      if (err instanceof Error) {
+        if (err.message === "Failed to fetch") {
+          setError(
+            `サーバー(${API_BASE_URL})に接続できませんでした。ネットワーク状態やAPIサーバーの起動状況、CORS設定を確認してください。`
+          );
+        } else {
+          setError(err.message);
+        }
+      } else {
+        setError("不明なエラーが発生しました。");
+      }
     } finally {
       setLoading(false);
     }
