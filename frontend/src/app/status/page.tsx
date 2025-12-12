@@ -7,6 +7,9 @@ interface BackendResponse {
   status: string;
 }
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
+
 export default function StatusPage() {
   const [backendMessage, setBackendMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
@@ -15,7 +18,7 @@ export default function StatusPage() {
   useEffect(() => {
     const fetchBackendData = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/hello");
+        const response = await fetch(`${API_BASE_URL}/api/hello`);
         if (!response.ok) {
           throw new Error("Failed to fetch from backend");
         }

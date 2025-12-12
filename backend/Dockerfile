@@ -24,6 +24,8 @@ WORKDIR /root/
 
 # Copy the binary from builder
 COPY --from=builder /app/main .
+# Copy Firebase credentials (if present) for DefaultCredentialsFile usage
+COPY --from=builder /app/serviceAccountKey.json ./serviceAccountKey.json
 
 EXPOSE 8080
 

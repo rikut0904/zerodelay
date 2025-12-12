@@ -33,11 +33,18 @@ export default function LoginPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        const message =
+        const serverMessage =
           typeof data.error === "string" && data.error.length > 0
             ? data.error
-            : "ログインに失敗しました。";
-        throw new Error(message);
+            : typeof data.message === "string" && data.message.length > 0
+              ? data.message
+              : "";
+        const fallback =
+          response.status >= 500
+            ? "サーバー側でエラーが発生しました。時間をおいて再度お試しください。"
+            : "メールアドレスまたはパスワードをご確認ください。";
+        const message = serverMessage || fallback;
+        throw new Error(`${message} (HTTP ${response.status})`);
       }
 
       await response.json().catch(() => undefined);
@@ -45,7 +52,17 @@ export default function LoginPage() {
       setInfo("ログインに成功しました。画面を遷移します。");
       router.push("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "不明なエラーが発生しました。");
+      if (err instanceof Error) {
+        if (err.message === "Failed to fetch") {
+          setError(
+            `サーバー(${API_BASE_URL})に接続できませんでした。ネットワーク状態やAPIサーバーの起動状況、CORS設定を確認してください。`
+          );
+        } else {
+          setError(err.message);
+        }
+      } else {
+        setError("不明なエラーが発生しました。");
+      }
     } finally {
       setLoading(false);
     }
