@@ -118,3 +118,27 @@ func (s *UserService) UpdateProfile(ctx context.Context, firebaseUID string, req
 
 	return user, nil
 }
+
+// UpdateFontSize updates the font size setting for a user
+func (s *UserService) UpdateFontSize(ctx context.Context, firebaseUID string, fontSize model.FontSizeOption) (*model.User, error) {
+	// 1. FirebaseUIDでユーザーを取得
+	user, err := s.userRepo.FindByFirebaseUID(firebaseUID)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	// 2. Settingを初期化または取得
+	if user.Setting == nil {
+		user.Setting = model.JSON{}
+	}
+
+	// 3. font_sizeを更新
+	user.Setting["font_size"] = string(fontSize)
+
+	// 4. PostgreSQLに保存
+	if err := s.userRepo.Update(user); err != nil {
+		return nil, fmt.Errorf("failed to update font size: %w", err)
+	}
+
+	return user, nil
+}

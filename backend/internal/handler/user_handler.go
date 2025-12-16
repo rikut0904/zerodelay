@@ -127,3 +127,36 @@ func (h *UserHandler) UpdateProfile(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, user)
 }
+
+// UpdateFontSize handles PATCH /api/v1/users/me/font-size
+func (h *UserHandler) UpdateFontSize(c echo.Context) error {
+	// ミドルウェアでセットされたFirebaseUIDを取得
+	uid := c.Get("uid")
+	if uid == nil {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Unauthorized"})
+	}
+
+	firebaseUID, ok := uid.(string)
+	if !ok {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Invalid UID format"})
+	}
+
+	var req model.FontSizeUpdateRequest
+	if err := c.Bind(&req); err != nil {
+		log.Printf("[WARN] UpdateFontSize bind failed for UID %s: %v", firebaseUID, err)
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
+	}
+
+	// バリデーション：有効な文字サイズか確認
+	if req.FontSize != model.FontSizeSmall && req.FontSize != model.FontSizeMedium && req.FontSize != model.FontSizeLarge {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid font size. Must be 'small', 'medium', or 'large'"})
+	}
+
+	user, err := h.userService.UpdateFontSize(c.Request().Context(), firebaseUID, req.FontSize)
+	if err != nil {
+		log.Printf("[ERROR] UpdateFontSize failed for UID %s: %v", firebaseUID, err)
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, user)
+}
