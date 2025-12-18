@@ -13,7 +13,7 @@ export default function Home() {
   const [map, setMap] = useState<any>(null);
   const [currentPos, setCurrentPos] = useState<[number, number] | null>(null);
 
-  type HazardType = "flood" | "tsunami" | "landslide";
+  type HazardType = "flood" | "tsunami" | "landslide" | "avalanche" | "inundation";
   const [hazardType, setHazardType] = useState<HazardType[]>([]);
 
   const toggleHazardType = (type: HazardType) => {
@@ -71,6 +71,8 @@ export default function Home() {
         <button style={{...styles.buttonBase,...(hazardType.includes("flood") ? styles.buttonOn : styles.buttonOff),}} onClick={() => toggleHazardType("flood")}>洪水</button>
         <button style={{...styles.buttonBase,...(hazardType.includes("tsunami") ? styles.buttonOn : styles.buttonOff),}} onClick={() => toggleHazardType("tsunami")}>津波</button>
         <button style={{...styles.buttonBase,...(hazardType.includes("landslide") ? styles.buttonOn : styles.buttonOff),}} onClick={() => toggleHazardType("landslide")}>土砂</button>
+        <button style={{...styles.buttonBase,...(hazardType.includes("avalanche") ? styles.buttonOn : styles.buttonOff)}} onClick={() => toggleHazardType("avalanche")}>雪崩</button>
+        <button style={{...styles.buttonBase,...(hazardType.includes("inundation") ? styles.buttonOn : styles.buttonOff)}} onClick={() => toggleHazardType("inundation")}>内水</button>
       </div>
 
       <div style={styles.mapArea}>

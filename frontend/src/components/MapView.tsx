@@ -43,7 +43,7 @@ export default function MapView({
 }: {
   onMapReady?: (map: any) => void;
   onPositionChange?: (pos: [number, number]) => void;
-  hazardType?:( "flood" | "tsunami" | "landslide" )[];
+  hazardType?:( "flood" | "tsunami" | "landslide" | "avalanche" | "inundation")[];
 }) {
   const [position, setPosition] = useState<[number, number] | null>(null);
   const [region, setRegion] = useState("current");
@@ -129,6 +129,8 @@ export default function MapView({
             flood: "https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_data/{z}/{x}/{y}.png",
             tsunami: "https://disaportaldata.gsi.go.jp/raster/04_tsunami_newlegend_pref_data/17/{z}/{x}/{y}.png",
             landslide: "https://disaportaldata.gsi.go.jp/raster/05_dosekiryukeikaikuiki_data/17/{z}/{x}/{y}.png",
+            avalanche: "https://disaportaldata.gsi.go.jp/raster/05_nadarekikenkasyo_data/17/{z}/{x}/{y}.png",
+            inundation: "https://disaportaldata.gsi.go.jp/raster/02_naisui_pref_data/17/{z}/{x}/{y}.png",
           }[type]}
           opacity={0.55}
           maxNativeZoom={17}
