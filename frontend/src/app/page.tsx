@@ -34,15 +34,8 @@ export default function Home() {
 
   return (
     <div style={styles.container}>
-      {/* 🔍 検索バー＋メニューアイコン */}
+      {/* 🔍 メニューアイコン */}
       <div style={styles.header}>
-        <div style={styles.searchBar}>
-          <input
-            type="text"
-            placeholder="住所・施設名を入力"
-            style={styles.searchInput}
-          />
-        </div>
 
         {isMobile && (
           <div
@@ -69,9 +62,9 @@ export default function Home() {
       )}
 
       <div style={styles.buttons}>
-        <button style={styles.button} onClick={() => toggleHazardType("flood")}>洪水</button>
-        <button style={styles.button} onClick={() => toggleHazardType("tsunami")}>津波</button>
-        <button style={styles.button} onClick={() => toggleHazardType("landslide")}>土砂</button>
+        <button style={{...styles.buttonBase,...(hazardType === "flood" ? styles.buttonOn : styles.buttonOff),}} onClick={() => toggleHazardType("flood")}>洪水</button>
+        <button style={{...styles.buttonBase,...(hazardType === "tsunami" ? styles.buttonOn : styles.buttonOff),}} onClick={() => toggleHazardType("tsunami")}>津波</button>
+        <button style={{...styles.buttonBase,...(hazardType === "landslide" ? styles.buttonOn : styles.buttonOff),}} onClick={() => toggleHazardType("landslide")}>土砂</button>
       </div>
 
       <div style={styles.mapArea}>
@@ -167,15 +160,33 @@ const styles: { [key: string]: React.CSSProperties } = {
     justifyContent: "space-around",
     padding: "10px",
   },
-  button: {
+  //button: {
+    //padding: "var(--button-padding)",
+    //backgroundColor: "#4A90E2",
+    //color: "#fff",
+    //border: "none",
+    //borderRadius: "6px",
+    //fontSize: "var(--app-font-size)",
+    //cursor: "pointer",
+  //},
+  buttonBase: {
     padding: "var(--button-padding)",
-    backgroundColor: "#4A90E2",
-    color: "#fff",
     border: "none",
     borderRadius: "6px",
     fontSize: "var(--app-font-size)",
     cursor: "pointer",
   },
+
+  buttonOn:{
+    backgroundColor: "#E74C3C",
+    color: "#fff",
+  },
+
+  buttonOff: {
+    backgroundColor: "#4A90E2",
+    color: "#fff",
+  },
+
   mapArea: {
     flex: 1,
     height: "100%",
