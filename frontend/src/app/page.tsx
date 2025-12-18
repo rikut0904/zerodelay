@@ -12,10 +12,16 @@ export default function Home() {
   const [isMobile, setIsMobile] = useState(false);
   const [map, setMap] = useState<any>(null);
   const [currentPos, setCurrentPos] = useState<[number, number] | null>(null);
-  const [hazardType, setHazardType] = useState<"flood" | "tsunami" |"landslide" | null>(null);
 
-  const toggleHazardType = (type: "flood" | "tsunami" | "landslide") => {
-    setHazardType((current) => (current === type ? null : type));
+  type HazardType = "flood" | "tsunami" | "landslide";
+  const [hazardType, setHazardType] = useState<HazardType[]>([]);
+
+  const toggleHazardType = (type: HazardType) => {
+    setHazardType((current) => 
+      current.includes(type) 
+      ? current.filter((t) => t !== type) 
+      : [...current, type]
+    );
   };
 
   useEffect(() => {
@@ -62,13 +68,16 @@ export default function Home() {
       )}
 
       <div style={styles.buttons}>
-        <button style={{...styles.buttonBase,...(hazardType === "flood" ? styles.buttonOn : styles.buttonOff),}} onClick={() => toggleHazardType("flood")}>洪水</button>
-        <button style={{...styles.buttonBase,...(hazardType === "tsunami" ? styles.buttonOn : styles.buttonOff),}} onClick={() => toggleHazardType("tsunami")}>津波</button>
-        <button style={{...styles.buttonBase,...(hazardType === "landslide" ? styles.buttonOn : styles.buttonOff),}} onClick={() => toggleHazardType("landslide")}>土砂</button>
+        <button style={{...styles.buttonBase,...(hazardType.includes("flood") ? styles.buttonOn : styles.buttonOff),}} onClick={() => toggleHazardType("flood")}>洪水</button>
+        <button style={{...styles.buttonBase,...(hazardType.includes("tsunami") ? styles.buttonOn : styles.buttonOff),}} onClick={() => toggleHazardType("tsunami")}>津波</button>
+        <button style={{...styles.buttonBase,...(hazardType.includes("landslide") ? styles.buttonOn : styles.buttonOff),}} onClick={() => toggleHazardType("landslide")}>土砂</button>
       </div>
 
       <div style={styles.mapArea}>
-        <MapView onMapReady={setMap} onPositionChange={setCurrentPos} hazardType={hazardType} />
+        <MapView onMapReady={setMap} 
+        onPositionChange={setCurrentPos} 
+        hazardType={hazardType} 
+        />
 
         <button
           onClick={returnToCurrentLocation}
@@ -160,7 +169,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     justifyContent: "space-around",
     padding: "10px",
   },
-  //button: {
     //padding: "var(--button-padding)",
     //backgroundColor: "#4A90E2",
     //color: "#fff",
