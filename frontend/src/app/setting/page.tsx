@@ -11,7 +11,7 @@ const defaultMapLayers = {
 type MapLayers = typeof defaultMapLayers;
 
 export default function SettingPage() {
-  const [openModal, setOpenModal] = useState<string | null>(null);
+  const [openSection, setOpenSection] = useState<string | null>(null);
   const [regionSetting, setRegionSetting] = useState<string>("current");
   const [mapLayers, setMapLayers] = useState<MapLayers>(defaultMapLayers);
   const [fontSize, setFontSize] = useState<string>("medium");
@@ -145,116 +145,137 @@ export default function SettingPage() {
       </section>
 
       <section style={styles.section}>
-        <button style={styles.itemButton} onClick={() => setOpenModal("region")}>
-          📍 表示する地域の設定
-        </button>
-
-        <button style={styles.itemButton} onClick={() => setOpenModal("map")}>
-          🗺️ ハザードマップの表示設定
-        </button>
-
-        <button style={styles.itemButton} onClick={() => setOpenModal("view")}>
-          👀 画面の見やすさ設定
-        </button>
-      </section>
-
-      {openModal === "region" && (
-        <Modal title="📍 表示する地域の設定" onClose={() => setOpenModal(null)}>
-          <label style={styles.label}>
-            <input
-              type="radio"
-              name="region"
-              value="current"
-              checked={regionSetting === "current"}
-              onChange={(e) => {
-                setRegionSetting(e.target.value);
-                autoSave("regionSetting", e.target.value);
-              }}
-            />
-            現在地を使用
-          </label>
-
-          <label style={styles.label}>
-            <input
-              type="radio"
-              name="region"
-              value="kit"
-              checked={regionSetting === "kit"}
-              onChange={(e) => {
-                setRegionSetting(e.target.value);
-                autoSave("regionSetting", e.target.value);
-              }}
-            />
-            金沢工業大学
-          </label>
-
-          <label style={styles.label}>
-            <input
-              type="radio"
-              name="region"
-              value="cityhall"
-              checked={regionSetting === "cityhall"}
-              onChange={(e) => {
-                setRegionSetting(e.target.value);
-                autoSave("regionSetting", e.target.value);
-              }}
-            />
-            金沢市役所
-          </label>
-        </Modal>
-      )}
-
-      {openModal === "map" && (
-        <Modal title="🗺️ ハザードマップの表示設定" onClose={() => setOpenModal(null)}>
-          {Object.keys(mapLayers).map((key) => (
-            <div key={key}>
+        <p style={styles.sectionLead}>よく使う設定をまとめています。</p>
+        <div style={styles.accordion}>
+          <button
+            style={{
+              ...styles.itemButton,
+              ...(openSection === "region" ? styles.itemButtonActive : {}),
+            }}
+            onClick={() => setOpenSection(openSection === "region" ? null : "region")}
+          >
+            <span style={styles.itemTitle}>📍 表示する地域の設定</span>
+            <span style={styles.itemDescription}>現在地/拠点の切り替えができます</span>
+          </button>
+          {openSection === "region" && (
+            <div style={styles.panel}>
               <label style={styles.label}>
                 <input
-                  type="checkbox"
-                  checked={mapLayers[key as keyof typeof mapLayers]}
+                  type="radio"
+                  name="region"
+                  value="current"
+                  checked={regionSetting === "current"}
                   onChange={(e) => {
-                    const updated = {
-                      ...mapLayers,
-                      [key]: e.target.checked,
-                    };
-                    setMapLayers(updated);
-                    autoSave("mapLayers", updated);
+                    setRegionSetting(e.target.value);
+                    autoSave("regionSetting", e.target.value);
                   }}
                 />
-                {key} を表示
+                現在地を使用
               </label>
-              {key === "避難所" && <p style={styles.note}>※ 現在作成中</p>}
+
+              <label style={styles.label}>
+                <input
+                  type="radio"
+                  name="region"
+                  value="kit"
+                  checked={regionSetting === "kit"}
+                  onChange={(e) => {
+                    setRegionSetting(e.target.value);
+                    autoSave("regionSetting", e.target.value);
+                  }}
+                />
+                金沢工業大学
+              </label>
+
+              <label style={styles.label}>
+                <input
+                  type="radio"
+                  name="region"
+                  value="cityhall"
+                  checked={regionSetting === "cityhall"}
+                  onChange={(e) => {
+                    setRegionSetting(e.target.value);
+                    autoSave("regionSetting", e.target.value);
+                  }}
+                />
+                金沢市役所
+              </label>
             </div>
-          ))}
-        </Modal>
-      )}
+          )}
 
-      {openModal === "view" && (
-        <Modal title="👀 画面の見やすさ設定" onClose={() => setOpenModal(null)}>
-          <h3 style={styles.optionTitle}>🅰️ 文字サイズの変更</h3>
+          <button
+            style={{
+              ...styles.itemButton,
+              ...(openSection === "map" ? styles.itemButtonActive : {}),
+            }}
+            onClick={() => setOpenSection(openSection === "map" ? null : "map")}
+          >
+            <span style={styles.itemTitle}>🗺️ ハザードマップの表示設定</span>
+            <span style={styles.itemDescription}>避難所などの表示をON/OFF</span>
+          </button>
+          {openSection === "map" && (
+            <div style={styles.panel}>
+              {Object.keys(mapLayers).map((key) => (
+                <div key={key}>
+                  <label style={styles.label}>
+                    <input
+                      type="checkbox"
+                      checked={mapLayers[key as keyof typeof mapLayers]}
+                      onChange={(e) => {
+                        const updated = {
+                          ...mapLayers,
+                          [key]: e.target.checked,
+                        };
+                        setMapLayers(updated);
+                        autoSave("mapLayers", updated);
+                      }}
+                    />
+                    {key} を表示
+                  </label>
+                  {key === "避難所" && <p style={styles.note}>※ 現在作成中</p>}
+                </div>
+              ))}
+            </div>
+          )}
 
-          {["small", "medium", "large"].map((size) => (
-            <label key={size} style={styles.label}>
-              <input
-                type="radio"
-                name="fontSize"
-                value={size}
-                checked={fontSize === size}
-                onChange={(e) => {
-                  setFontSize(e.target.value);
-                  autoSave("fontSize", e.target.value, () => {
-                    document.documentElement.style.setProperty(
-                      "--app-font-size",
-                      fontSizeMap[e.target.value]
-                    );
-                  });
-                }}
-              />
-              {size === "small" ? "小" : size === "medium" ? "中" : "大"}
-            </label>
-          ))}
-        </Modal>
-      )}
+          <button
+            style={{
+              ...styles.itemButton,
+              ...(openSection === "view" ? styles.itemButtonActive : {}),
+            }}
+            onClick={() => setOpenSection(openSection === "view" ? null : "view")}
+          >
+            <span style={styles.itemTitle}>👀 画面の見やすさ設定</span>
+            <span style={styles.itemDescription}>文字サイズの変更</span>
+          </button>
+          {openSection === "view" && (
+            <div style={styles.panel}>
+              <h3 style={styles.optionTitle}>🅰️ 文字サイズの変更</h3>
+
+              {["small", "medium", "large"].map((size) => (
+                <label key={size} style={styles.label}>
+                  <input
+                    type="radio"
+                    name="fontSize"
+                    value={size}
+                    checked={fontSize === size}
+                    onChange={(e) => {
+                      setFontSize(e.target.value);
+                      autoSave("fontSize", e.target.value, () => {
+                        document.documentElement.style.setProperty(
+                          "--app-font-size",
+                          fontSizeMap[e.target.value]
+                        );
+                      });
+                    }}
+                  />
+                  {size === "small" ? "小" : size === "medium" ? "中" : "大"}
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
 
       {showLogoutConfirm && (
         <Modal title="ログアウト確認" onClose={() => setShowLogoutConfirm(false)}>
@@ -291,8 +312,8 @@ export default function SettingPage() {
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
-    padding: "60px 20px 80px",
-    backgroundColor: "#f9f9f9",
+    padding: "60px 20px 120px",
+    background: "linear-gradient(180deg, #f9fbff 0%, #f3f4f6 100%)",
     minHeight: "100vh",
     fontFamily: "sans-serif",
   },
@@ -301,10 +322,11 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: 20,
   },
   section: {
-    padding: 12,
-    border: "1px solid #ddd",
-    borderRadius: 12,
-    background: "#fafafa",
+    padding: 16,
+    border: "1px solid #e5e7eb",
+    borderRadius: 14,
+    background: "#fff",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.04)",
     marginBottom: 32,
     display: "flex",
     flexDirection: "column",
@@ -344,16 +366,40 @@ const styles: Record<string, React.CSSProperties> = {
   itemButton: {
     fontSize: "var(--app-font-size)",
     padding: "14px 16px",
-    borderRadius: 8,
-    border: "1px solid #ccc",
-    background: "#fff",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "#e5e7eb",
+    background: "#f8fafc",
     textAlign: "left",
     cursor: "pointer",
+    display: "flex",
+    flexDirection: "column",
+    gap: 4,
+    transition: "background 0.15s ease, border-color 0.15s ease",
+  },
+  itemTitle: {
+    fontWeight: 700,
+    fontSize: "1.02em",
+  },
+  itemDescription: {
+    color: "#6b7280",
+    fontSize: "0.95em",
   },
   label: {
     fontSize: "var(--app-font-size)",
     margin: "6px 0",
     display: "block",
+    padding: "10px 12px",
+    borderRadius: 10,
+    background: "#f9fafb",
+    border: "1px solid #e5e7eb",
+  },
+  panel: {
+    padding: "10px 4px 4px",
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
   },
   optionTitle: {
     fontSize: "1.1em",
@@ -399,5 +445,19 @@ const styles: Record<string, React.CSSProperties> = {
     margin: "4px 0 0 24px",
     fontSize: "0.9em",
     color: "#6b7280",
+  },
+  sectionLead: {
+    margin: "-2px 0 4px",
+    color: "#6b7280",
+    fontSize: "0.95em",
+  },
+  accordion: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+  },
+  itemButtonActive: {
+    borderColor: "#2563eb",
+    background: "#e0f2fe",
   },
 };
