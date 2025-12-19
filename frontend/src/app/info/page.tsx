@@ -192,6 +192,8 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: "#fff",
     padding: "10px 0",
     borderTop: "1px solid #ccc",
+    zIndex: 3000,
+    boxShadow: "0 -2px 6px rgba(0,0,0,0.08)",
   },
   link: {
     textDecoration: "none",

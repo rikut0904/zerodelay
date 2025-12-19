@@ -54,14 +54,3 @@ body {
     --button-padding: 12px 24px;
   }
 }
-
-/* スマホ（幅768px未満）では下のナビゲーションを隠す */
-@media (max-width: 767px) {
-  [style*="nav"] {
-    display: none !important;
-  }
-
-  [style*="menuIcon"] {
-    display: block !important;
-  }
-}
