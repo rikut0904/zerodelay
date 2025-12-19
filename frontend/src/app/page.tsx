@@ -7,6 +7,8 @@ import dynamic from "next/dynamic";
 
 const MapView = dynamic(() => import("@/components/MapView"), { ssr: false });
 
+export type HazardType = "flood" | "tsunami" | "landslide" | "avalanche" | "inundation";
+
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -15,6 +17,29 @@ export default function Home() {
 
   type HazardType = "flood" | "tsunami" | "landslide" | "avalanche" | "inundation";
   const [hazardType, setHazardType] = useState<HazardType[]>([]);
+
+  const hazardButtons = [
+    { type: "flood" as const, label: "洪水" },
+    { type: "tsunami" as const, label: "津波" },
+    { type: "landslide" as const, label: "土砂" },
+    { type: "avalanche" as const, label: "雪崩" },
+    { type: "inundation" as const, label: "内水" },
+  ];
+
+  <div style={styles.buttons}>
+    {hazardButtons.map(({ type, label }) => (
+      <button
+        key={type}
+        style={{
+          ...styles.buttonBase,
+          ...(hazardType.includes(type) ? styles.buttonOn : styles.buttonOff),
+        }}
+        onClick={() => toggleHazardType(type)}
+      >
+        {label}
+      </button>
+    ))}
+  </div>
 
   const toggleHazardType = (type: HazardType) => {
     setHazardType((current) => 
@@ -66,14 +91,6 @@ export default function Home() {
           </Link>
         </div>
       )}
-
-      <div style={styles.buttons}>
-        <button style={{...styles.buttonBase,...(hazardType.includes("flood") ? styles.buttonOn : styles.buttonOff),}} onClick={() => toggleHazardType("flood")}>洪水</button>
-        <button style={{...styles.buttonBase,...(hazardType.includes("tsunami") ? styles.buttonOn : styles.buttonOff),}} onClick={() => toggleHazardType("tsunami")}>津波</button>
-        <button style={{...styles.buttonBase,...(hazardType.includes("landslide") ? styles.buttonOn : styles.buttonOff),}} onClick={() => toggleHazardType("landslide")}>土砂</button>
-        <button style={{...styles.buttonBase,...(hazardType.includes("avalanche") ? styles.buttonOn : styles.buttonOff)}} onClick={() => toggleHazardType("avalanche")}>雪崩</button>
-        <button style={{...styles.buttonBase,...(hazardType.includes("inundation") ? styles.buttonOn : styles.buttonOff)}} onClick={() => toggleHazardType("inundation")}>内水</button>
-      </div>
 
       <div style={styles.mapArea}>
         <MapView onMapReady={setMap} 

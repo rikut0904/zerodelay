@@ -5,6 +5,15 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { ScaleControl } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import type { HazardType } from "@/app/page";
+
+const HAZARD_LAYER_URLS: Record<HazardType, string> = {
+  flood: "https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_data/{z}/{x}/{y}.png",
+  tsunami: "https://disaportaldata.gsi.go.jp/raster/04_tsunami_newlegend_pref_data/17/{z}/{x}/{y}.png",
+  landslide: "https://disaportaldata.gsi.go.jp/raster/05_dosekiryukeikaikuiki_data/17/{z}/{x}/{y}.png",
+  avalanche: "https://disaportaldata.gsi.go.jp/raster/05_nadarekikenkasyo_data/17/{z}/{x}/{y}.png",
+  inundation: "https://disaportaldata.gsi.go.jp/raster/02_naisui_pref_data/17/{z}/{x}/{y}.png",
+};
 
 const DefaultIcon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -43,7 +52,7 @@ export default function MapView({
 }: {
   onMapReady?: (map: any) => void;
   onPositionChange?: (pos: [number, number]) => void;
-  hazardType?:( "flood" | "tsunami" | "landslide" | "avalanche" | "inundation")[];
+  hazardType?: HazardType[];
 }) {
   const [position, setPosition] = useState<[number, number] | null>(null);
   const [region, setRegion] = useState("current");
@@ -125,13 +134,7 @@ export default function MapView({
       {hazardType?.map((type) => (
         <TileLayer
         key={type}
-          url={{
-            flood: "https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_data/{z}/{x}/{y}.png",
-            tsunami: "https://disaportaldata.gsi.go.jp/raster/04_tsunami_newlegend_pref_data/17/{z}/{x}/{y}.png",
-            landslide: "https://disaportaldata.gsi.go.jp/raster/05_dosekiryukeikaikuiki_data/17/{z}/{x}/{y}.png",
-            avalanche: "https://disaportaldata.gsi.go.jp/raster/05_nadarekikenkasyo_data/17/{z}/{x}/{y}.png",
-            inundation: "https://disaportaldata.gsi.go.jp/raster/02_naisui_pref_data/17/{z}/{x}/{y}.png",
-          }[type]}
+          url={HAZARD_LAYER_URLS[type]}
           opacity={0.55}
           maxNativeZoom={17}
           maxZoom={18}
