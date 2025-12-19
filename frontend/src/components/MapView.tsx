@@ -16,6 +16,7 @@ const HAZARD_LAYER_URLS: Record<HazardType, string> = {
 
 import { shelters } from "@/data/shelters";
 import { shelterMarkerIcon } from "@/lib/mapIcons";
+import { useLayerVisibility } from "@/hooks/useLayerVisibility";
 
 const KIT_POSITION: [number, number] = [36.531029, 136.62774];
 const CITY_HALL_POSITION: [number, number] = [36.5613, 136.6562];
@@ -51,7 +52,7 @@ export default function MapView({
 }) {
   const [position, setPosition] = useState<[number, number] | null>(null);
   const [region, setRegion] = useState("current");
-  const [showShelters, setShowShelters] = useState(true);
+  const showShelters = useLayerVisibility("避難所");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -62,23 +63,6 @@ export default function MapView({
     } catch (error) {
       console.error("Failed to parse regionSetting from localStorage", error);
       localStorage.removeItem("regionSetting");
-    }
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const savedLayers = localStorage.getItem("mapLayers");
-    if (!savedLayers) {
-      setShowShelters(true);
-      return;
-    }
-    try {
-      const parsed = JSON.parse(savedLayers);
-      const stored = parsed?.["避難所"];
-      setShowShelters(typeof stored === "boolean" ? stored : true);
-    } catch (error) {
-      console.error("Failed to parse mapLayers from localStorage", error);
-      setShowShelters(true);
     }
   }, []);
 

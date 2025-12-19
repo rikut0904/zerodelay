@@ -6,12 +6,29 @@ import dynamic from "next/dynamic";
 
 import { shelters } from "@/data/shelters";
 import { useApplyFontSize } from "@/hooks/useApplyFontSize";
+import { useLayerVisibility } from "@/hooks/useLayerVisibility";
 
 const ShelterMap = dynamic(() => import("@/components/ShelterMap"), { ssr: false });
 
 export default function InfoPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   useApplyFontSize();
+  const showShelters = useLayerVisibility("避難所");
+
+  const toggleShelters = (checked: boolean) => {
+    if (typeof window === "undefined") return;
+    const defaultLayers = { 避難所: true };
+    try {
+      const saved = localStorage.getItem("mapLayers");
+      const parsed = saved ? JSON.parse(saved) : {};
+      const next = { ...defaultLayers, ...parsed, 避難所: checked };
+      localStorage.setItem("mapLayers", JSON.stringify(next));
+      window.dispatchEvent(new Event("mapLayersUpdated"));
+    } catch {
+      localStorage.setItem("mapLayers", JSON.stringify({ 避難所: checked }));
+      window.dispatchEvent(new Event("mapLayersUpdated"));
+    }
+  };
 
   return (
     <div style={styles.container}>
@@ -20,6 +37,14 @@ export default function InfoPage() {
       <section style={styles.section}>
         <h2 style={styles.subtitle}>避難所一覧</h2>
         <p style={styles.lead}>タップすると地図がその避難所へ移動します。</p>
+        <label style={styles.toggleRow}>
+          <input
+            type="checkbox"
+            checked={showShelters}
+            onChange={(e) => toggleShelters(e.target.checked)}
+          />
+          <span>避難所のピンを表示</span>
+        </label>
         <div style={styles.shelterGrid}>
           {shelters.map((shelter) => (
             <button
@@ -83,6 +108,14 @@ const styles: Record<string, React.CSSProperties> = {
   lead: {
     margin: "0 0 10px",
     color: "#4b5563",
+  },
+  toggleRow: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 12,
+    fontSize: "var(--app-font-size)",
+    cursor: "pointer",
   },
   shelterGrid: {
     display: "grid",

@@ -7,6 +7,7 @@ import "leaflet/dist/leaflet.css";
 
 import { Shelter } from "@/data/shelters";
 import { shelterMarkerIcon } from "@/lib/mapIcons";
+import { useLayerVisibility } from "@/hooks/useLayerVisibility";
 
 type Props = {
   shelters: Shelter[];
@@ -33,6 +34,7 @@ function FitAndFocus({ shelters, selectedId }: Props) {
 }
 
 export default function ShelterMap({ shelters, selectedId }: Props) {
+  const showShelters = useLayerVisibility("避難所");
   const initialCenter: [number, number] = shelters.length
     ? [shelters[0].lat, shelters[0].lng]
     : [36.5613, 136.6562];
@@ -41,19 +43,20 @@ export default function ShelterMap({ shelters, selectedId }: Props) {
     <MapContainer center={initialCenter} zoom={14} style={{ height: "100%", width: "100%" }}>
       <FitAndFocus shelters={shelters} selectedId={selectedId} />
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-      {shelters.map((shelter) => (
-        <Marker
-          key={shelter.id}
-          position={[shelter.lat, shelter.lng]}
-          icon={shelterMarkerIcon}
-        >
-          <Popup>
-            <strong>{shelter.name}</strong>
-            <br />
-            {shelter.address}
-          </Popup>
-        </Marker>
-      ))}
+      {showShelters &&
+        shelters.map((shelter) => (
+          <Marker
+            key={shelter.id}
+            position={[shelter.lat, shelter.lng]}
+            icon={shelterMarkerIcon}
+          >
+            <Popup>
+              <strong>{shelter.name}</strong>
+              <br />
+              {shelter.address}
+            </Popup>
+          </Marker>
+        ))}
     </MapContainer>
   );
 }

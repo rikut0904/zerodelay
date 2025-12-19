@@ -97,6 +97,9 @@ export default function SettingPage() {
 
   const autoSave = (key: string, value: any, extraEffect?: () => void) => {
     localStorage.setItem(key, JSON.stringify(value));
+    if (key === "mapLayers") {
+      window.dispatchEvent(new Event("mapLayersUpdated"));
+    }
     if (extraEffect) extraEffect();
   };
 
