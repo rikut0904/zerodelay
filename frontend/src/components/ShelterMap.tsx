@@ -6,22 +6,26 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 import { Shelter } from "@/data/shelters";
-import { shelterMarkerIcon } from "@/lib/mapIcons";
+import { currentMarkerIcon, shelterMarkerIcon } from "@/lib/mapIcons";
 import { useLayerVisibility } from "@/hooks/useLayerVisibility";
 
 type Props = {
   shelters: Shelter[];
   selectedId?: string | null;
+  currentPosition?: [number, number] | null;
 };
 
-function FitAndFocus({ shelters, selectedId }: Props) {
+function FitAndFocus({ shelters, selectedId, currentPosition }: Props) {
   const map = useMap();
 
   useEffect(() => {
-    if (!shelters.length) return;
-    const bounds = L.latLngBounds(shelters.map((s) => [s.lat, s.lng]));
+    if (!shelters.length && !currentPosition) return;
+    const points = shelters.map((s) => [s.lat, s.lng]) as [number, number][];
+    if (currentPosition) points.push(currentPosition);
+    if (!points.length) return;
+    const bounds = L.latLngBounds(points);
     map.fitBounds(bounds, { padding: [24, 24], maxZoom: 17 });
-  }, [map, shelters]);
+  }, [currentPosition, map, shelters]);
 
   useEffect(() => {
     if (!selectedId) return;
@@ -33,16 +37,21 @@ function FitAndFocus({ shelters, selectedId }: Props) {
   return null;
 }
 
-export default function ShelterMap({ shelters, selectedId }: Props) {
+export default function ShelterMap({ shelters, selectedId, currentPosition }: Props) {
   const showShelters = useLayerVisibility("避難所");
   const initialCenter: [number, number] = shelters.length
     ? [shelters[0].lat, shelters[0].lng]
-    : [36.5613, 136.6562];
+    : currentPosition ?? [36.5613, 136.6562];
 
   return (
     <MapContainer center={initialCenter} zoom={14} style={{ height: "100%", width: "100%" }}>
-      <FitAndFocus shelters={shelters} selectedId={selectedId} />
+      <FitAndFocus shelters={shelters} selectedId={selectedId} currentPosition={currentPosition} />
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      {currentPosition && (
+        <Marker position={currentPosition} icon={currentMarkerIcon}>
+          <Popup>現在地</Popup>
+        </Marker>
+      )}
       {showShelters &&
         shelters.map((shelter) => (
           <Marker

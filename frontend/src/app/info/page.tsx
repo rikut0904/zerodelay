@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 
 import { shelters } from "@/data/shelters";
 import { useApplyFontSize } from "@/hooks/useApplyFontSize";
 import { useLayerVisibility } from "@/hooks/useLayerVisibility";
+import { useCurrentPosition } from "@/hooks/useCurrentPosition";
 
 const ShelterMap = dynamic(() => import("@/components/ShelterMap"), { ssr: false });
 
@@ -14,6 +15,8 @@ export default function InfoPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   useApplyFontSize();
   const showShelters = useLayerVisibility("避難所");
+  const mapSectionRef = useRef<HTMLDivElement | null>(null);
+  const currentPos = useCurrentPosition();
 
   const toggleShelters = (checked: boolean) => {
     if (typeof window === "undefined") return;
@@ -29,6 +32,33 @@ export default function InfoPage() {
       window.dispatchEvent(new Event("mapLayersUpdated"));
     }
   };
+
+  const handleSelectShelter = (id: string) => {
+    setSelectedId(id);
+    mapSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const sheltersWithDistance = useMemo(() => {
+    if (!currentPos) return shelters.map((s) => ({ shelter: s, distanceKm: null }));
+    const toRad = (deg: number) => (deg * Math.PI) / 180;
+    const R = 6371; // km
+    const [lat1, lon1] = currentPos;
+    return shelters
+      .map((s) => {
+        const lat2 = s.lat;
+        const lon2 = s.lng;
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const d = R * c;
+        return { shelter: s, distanceKm: d };
+      })
+      .sort((a, b) => (a.distanceKm ?? 0) - (b.distanceKm ?? 0));
+  }, [currentPos]);
 
   return (
     <div style={styles.container}>
@@ -46,24 +76,26 @@ export default function InfoPage() {
           <span>避難所のピンを表示</span>
         </label>
         <div style={styles.shelterGrid}>
-          {shelters.map((shelter) => (
+          {sheltersWithDistance.map(({ shelter, distanceKm }) => (
             <button
               key={shelter.id}
               style={styles.shelterCard}
-              onClick={() => setSelectedId(shelter.id)}
+              onClick={() => handleSelectShelter(shelter.id)}
             >
               <div style={styles.shelterName}>{shelter.name}</div>
               <div style={styles.shelterAddress}>{shelter.address}</div>
-              <div style={styles.cardHint}>地図で位置を確認</div>
+              <div style={styles.cardHint}>
+                {distanceKm != null ? `現在地から約 ${distanceKm.toFixed(1)} km` : "地図で位置を確認"}
+              </div>
             </button>
           ))}
         </div>
       </section>
 
-      <section style={styles.section}>
+      <section style={styles.section} ref={mapSectionRef}>
         <h2 style={styles.subtitle}>地図で確認</h2>
         <div style={styles.mapWrapper}>
-          <ShelterMap shelters={shelters} selectedId={selectedId} />
+          <ShelterMap shelters={shelters} selectedId={selectedId} currentPosition={currentPos} />
         </div>
       </section>
 
