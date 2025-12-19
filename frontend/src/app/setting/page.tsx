@@ -2,12 +2,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import Modal from "@/components/Modal";
-
-const fontSizeMap: Record<string, string> = {
-  small: "14px",
-  medium: "16px",
-  large: "18px",
-};
+import { fontSizeMap } from "@/constants/font";
 
 const defaultMapLayers = {
   避難所: true,

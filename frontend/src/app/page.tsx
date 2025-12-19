@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import dynamic from "next/dynamic";
 
+import { useApplyFontSize } from "@/hooks/useApplyFontSize";
+
 const MapView = dynamic(() => import("@/components/MapView"), { ssr: false });
 
 export type HazardType = "flood" | "tsunami" | "landslide" | "avalanche" | "inundation";
@@ -16,6 +18,7 @@ export default function Home() {
   const [currentPos, setCurrentPos] = useState<[number, number] | null>(null);
 
   const [hazardType, setHazardType] = useState<HazardType[]>([]);
+  useApplyFontSize();
 
   const hazardButtons = [
     { type: "flood" as const, label: "洪水" },

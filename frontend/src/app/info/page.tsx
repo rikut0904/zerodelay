@@ -5,11 +5,13 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 
 import { shelters } from "@/data/shelters";
+import { useApplyFontSize } from "@/hooks/useApplyFontSize";
 
 const ShelterMap = dynamic(() => import("@/components/ShelterMap"), { ssr: false });
 
 export default function InfoPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  useApplyFontSize();
 
   return (
     <div style={styles.container}>
@@ -94,6 +96,7 @@ const styles: Record<string, React.CSSProperties> = {
     border: "1px solid #e5e7eb",
     background: "#f8fafc",
     cursor: "pointer",
+    fontSize: "var(--app-font-size)",
   },
   shelterName: {
     fontWeight: 700,
