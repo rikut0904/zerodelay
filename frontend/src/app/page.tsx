@@ -121,7 +121,7 @@ export default function Home() {
           onClick={returnToCurrentLocation}
           style={{
             position: "absolute",
-            bottom: "20px",
+            bottom: isMobile ? "20px" : "70px",
             right: "20px",
             padding: "10px 14px",
             backgroundColor: "#4A90E2",
