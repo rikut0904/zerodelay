@@ -3,15 +3,10 @@
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { ScaleControl } from "react-leaflet";
-import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-const DefaultIcon = L.icon({
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  iconAnchor: [12, 41],
-});
-L.Marker.prototype.options.icon = DefaultIcon;
+import { shelters } from "@/data/shelters";
+import { shelterMarkerIcon } from "@/lib/mapIcons";
 
 const KIT_POSITION: [number, number] = [36.531029, 136.62774];
 const CITY_HALL_POSITION: [number, number] = [36.5613, 136.6562];
@@ -45,6 +40,7 @@ export default function MapView({
 }) {
   const [position, setPosition] = useState<[number, number] | null>(null);
   const [region, setRegion] = useState("current");
+  const [showShelters, setShowShelters] = useState(true);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -55,6 +51,23 @@ export default function MapView({
     } catch (error) {
       console.error("Failed to parse regionSetting from localStorage", error);
       localStorage.removeItem("regionSetting");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const savedLayers = localStorage.getItem("mapLayers");
+    if (!savedLayers) {
+      setShowShelters(true);
+      return;
+    }
+    try {
+      const parsed = JSON.parse(savedLayers);
+      const stored = parsed?.["避難所"];
+      setShowShelters(typeof stored === "boolean" ? stored : true);
+    } catch (error) {
+      console.error("Failed to parse mapLayers from localStorage", error);
+      setShowShelters(true);
     }
   }, []);
 
@@ -122,6 +135,20 @@ export default function MapView({
       <Marker position={position}>
         <Popup>あなたの設定した地域</Popup>
       </Marker>
+      {showShelters &&
+        shelters.map((shelter) => (
+          <Marker
+            key={shelter.id}
+            position={[shelter.lat, shelter.lng]}
+            icon={shelterMarkerIcon}
+          >
+            <Popup>
+              <strong>{shelter.name}</strong>
+              <br />
+              {shelter.address}
+            </Popup>
+          </Marker>
+        ))}
     </MapContainer>
   );
 }

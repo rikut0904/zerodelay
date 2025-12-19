@@ -10,7 +10,7 @@ const fontSizeMap: Record<string, string> = {
 };
 
 const defaultMapLayers = {
-  避難所: false,
+  避難所: true,
 };
 
 type MapLayers = typeof defaultMapLayers;
