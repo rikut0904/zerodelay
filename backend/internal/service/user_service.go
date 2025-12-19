@@ -78,6 +78,7 @@ func (s *UserService) UpdateProfile(ctx context.Context, firebaseUID string, req
 	}
 
 	// 2. 部分更新：送信されたフィールドのみ更新
+	isFirstAgeInput := false
 	if req.Name != nil {
 		user.Name = *req.Name
 	}
@@ -85,6 +86,10 @@ func (s *UserService) UpdateProfile(ctx context.Context, firebaseUID string, req
 		user.NameKana = *req.NameKana
 	}
 	if req.Old != nil {
+		// 初回の年齢入力判定（前回が0の場合）
+		if user.Old == 0 {
+			isFirstAgeInput = true
+		}
 		user.Old = *req.Old
 	}
 	if req.Sex != nil {
@@ -99,19 +104,26 @@ func (s *UserService) UpdateProfile(ctx context.Context, firebaseUID string, req
 		user.Email = *req.Email
 	}
 
-	// 4. Setting更新時はマージ
+	// 4. Setting初期化またはマージ
+	if user.Setting == nil {
+		user.Setting = model.JSON{}
+	}
+
+	// 5. 初回の年齢入力時は、自動的にフォントサイズを設定
+	if isFirstAgeInput {
+		defaultFontSize := model.GetDefaultFontSizeByAge(user.Old)
+		user.Setting["font_size"] = string(defaultFontSize)
+	}
+
+	// 6. Setting更新時はマージ
 	if req.Setting != nil {
-		if user.Setting == nil {
-			user.Setting = req.Setting
-		} else {
-			// 既存Settingと新規Settingをマージ
-			for key, value := range req.Setting {
-				user.Setting[key] = value
-			}
+		// 既存Settingと新規Settingをマージ
+		for key, value := range req.Setting {
+			user.Setting[key] = value
 		}
 	}
 
-	// 5. PostgreSQLに保存
+	// 7. PostgreSQLに保存
 	if err := s.userRepo.Update(user); err != nil {
 		return nil, fmt.Errorf("failed to update user: %w", err)
 	}
