@@ -26,11 +26,15 @@ export default function Home() {
   ];
 
   const toggleHazardType = (type: HazardType) => {
-    setHazardType((current) => 
-      current.includes(type) 
-      ? current.filter((t) => t !== type) 
-      : [...current, type]
-    );
+    setHazardType((current) =>{
+      const newTypes = new Set(current);
+      if (newTypes.has(type)) {
+        newTypes.delete(type);
+      }else {
+        newTypes.add(type);
+      }
+      return [...newTypes];
+    });
   };
 
   useEffect(() => {
@@ -190,6 +194,7 @@ const styles: { [key: string]: React.CSSProperties } = {
 
   buttonBase: {
     padding: "var(--button-padding)",
+    color: "#ffff",
     border: "none",
     borderRadius: "6px",
     fontSize: "var(--app-font-size)",
@@ -198,12 +203,10 @@ const styles: { [key: string]: React.CSSProperties } = {
 
   buttonOn:{
     backgroundColor: "#E74C3C",
-    color: "#fff",
   },
 
   buttonOff: {
     backgroundColor: "#4A90E2",
-    color: "#fff",
   },
 
   mapArea: {
