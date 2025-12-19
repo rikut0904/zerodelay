@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
 
-
-
 export const metadata: Metadata = {
   title: "ZeroDelay App",
   description: "Next.js + Go Application",

@@ -1,6 +1,9 @@
 package router
 
 import (
+	"os"
+	"strings"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
@@ -21,7 +24,7 @@ func SetupRoutes(
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.Use(middleware.CORS())
+	e.Use(middleware.CORSWithConfig(buildCORSConfig()))
 
 	// Health check (outside of API versioning)
 	e.GET("/health", healthHandler.Health)
@@ -57,4 +60,35 @@ func SetupRoutes(
 	places.POST("", placeHandler.CreatePlace)
 	places.PUT("/:id", placeHandler.UpdatePlace)
 	places.DELETE("/:id", placeHandler.DeletePlace)
+}
+
+func buildCORSConfig() middleware.CORSConfig {
+	defaultOrigins := []string{"http://localhost:3000"}
+	allowedOrigins := defaultOrigins
+	if raw := strings.TrimSpace(os.Getenv("CORS_ALLOWED_ORIGINS")); raw != "" {
+		if origins := filterSplit(raw); len(origins) > 0 {
+			allowedOrigins = origins
+		} else {
+			allowedOrigins = defaultOrigins
+		}
+	}
+
+	return middleware.CORSConfig{
+		AllowOrigins:     allowedOrigins,
+		AllowMethods:     []string{echo.GET, echo.POST, echo.PUT, echo.PATCH, echo.DELETE, echo.OPTIONS},
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
+		ExposeHeaders:    []string{echo.HeaderAuthorization},
+		AllowCredentials: true,
+	}
+}
+
+func filterSplit(raw string) []string {
+	parts := strings.Split(raw, ",")
+	result := make([]string, 0, len(parts))
+	for _, p := range parts {
+		if trimmed := strings.TrimSpace(p); trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	return result
 }

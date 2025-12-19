@@ -20,7 +20,7 @@ DB_LOG_LEVEL=warn
 ```
 
 ### 3. serviceAccountKey.jsonの配置
-Firebaseコンソールからダウンロードした`serviceAccountKey.json`を`backend/`ディレクトリに配置してください。
+Firebaseコンソールからダウンロードした`serviceAccountKey.json`を`backend/`ディレクトリに配置してください。Railwayなどファイルを配置できない環境では、鍵のJSON文字列を `FIREBASE_CREDENTIALS_JSON` として環境変数に設定する方法でも動作します。
 
 ---
 
