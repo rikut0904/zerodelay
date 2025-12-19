@@ -15,7 +15,6 @@ export default function Home() {
   const [map, setMap] = useState<any>(null);
   const [currentPos, setCurrentPos] = useState<[number, number] | null>(null);
 
-  type HazardType = "flood" | "tsunami" | "landslide" | "avalanche" | "inundation";
   const [hazardType, setHazardType] = useState<HazardType[]>([]);
 
   const hazardButtons = [
@@ -25,21 +24,6 @@ export default function Home() {
     { type: "avalanche" as const, label: "雪崩" },
     { type: "inundation" as const, label: "内水" },
   ];
-
-  <div style={styles.buttons}>
-    {hazardButtons.map(({ type, label }) => (
-      <button
-        key={type}
-        style={{
-          ...styles.buttonBase,
-          ...(hazardType.includes(type) ? styles.buttonOn : styles.buttonOff),
-        }}
-        onClick={() => toggleHazardType(type)}
-      >
-        {label}
-      </button>
-    ))}
-  </div>
 
   const toggleHazardType = (type: HazardType) => {
     setHazardType((current) => 
@@ -91,6 +75,21 @@ export default function Home() {
           </Link>
         </div>
       )}
+
+      <div style={styles.buttons}>
+        {hazardButtons.map(({ type, label }) => (
+          <button
+            key={type}
+            style={{
+              ...styles.buttonBase,
+              ...(hazardType.includes(type) ? styles.buttonOn : styles.buttonOff),
+            }}
+            onClick={() => toggleHazardType(type)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
 
       <div style={styles.mapArea}>
         <MapView onMapReady={setMap} 
@@ -188,14 +187,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     justifyContent: "space-around",
     padding: "10px",
   },
-    //padding: "var(--button-padding)",
-    //backgroundColor: "#4A90E2",
-    //color: "#fff",
-    //border: "none",
-    //borderRadius: "6px",
-    //fontSize: "var(--app-font-size)",
-    //cursor: "pointer",
-  //},
+
   buttonBase: {
     padding: "var(--button-padding)",
     border: "none",
