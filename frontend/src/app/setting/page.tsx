@@ -9,14 +9,16 @@ const fontSizeMap: Record<string, string> = {
   large: "18px",
 };
 
+const defaultMapLayers = {
+  避難所: false,
+};
+
+type MapLayers = typeof defaultMapLayers;
+
 export default function SettingPage() {
   const [openModal, setOpenModal] = useState<string | null>(null);
   const [regionSetting, setRegionSetting] = useState<string>("current");
-  const [mapLayers, setMapLayers] = useState({
-    避難所: false,
-    河川水位: false,
-    土砂危険エリア: false,
-  });
+  const [mapLayers, setMapLayers] = useState<MapLayers>(defaultMapLayers);
   const [fontSize, setFontSize] = useState<string>("medium");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
@@ -34,7 +36,16 @@ export default function SettingPage() {
 
     if (savedLayers) {
       try {
-        setMapLayers(JSON.parse(savedLayers));
+        const parsed = JSON.parse(savedLayers);
+        const sanitizedLayers = Object.keys(defaultMapLayers).reduce<MapLayers>(
+          (acc, key) => {
+            const typedKey = key as keyof MapLayers;
+            acc[typedKey] = Boolean(parsed?.[typedKey]);
+            return acc;
+          },
+          { ...defaultMapLayers }
+        );
+        setMapLayers(sanitizedLayers);
       } catch (error) {
         console.error("Failed to parse mapLayers from localStorage", error);
         localStorage.removeItem("mapLayers");
@@ -198,21 +209,24 @@ export default function SettingPage() {
       {openModal === "map" && (
         <Modal title="🗺️ ハザードマップの表示設定" onClose={() => setOpenModal(null)}>
           {Object.keys(mapLayers).map((key) => (
-            <label key={key} style={styles.label}>
-              <input
-                type="checkbox"
-                checked={mapLayers[key as keyof typeof mapLayers]}
-                onChange={(e) => {
-                  const updated = {
-                    ...mapLayers,
-                    [key]: e.target.checked,
-                  };
-                  setMapLayers(updated);
-                  autoSave("mapLayers", updated);
-                }}
-              />
-              {key} を表示
-            </label>
+            <div key={key}>
+              <label style={styles.label}>
+                <input
+                  type="checkbox"
+                  checked={mapLayers[key as keyof typeof mapLayers]}
+                  onChange={(e) => {
+                    const updated = {
+                      ...mapLayers,
+                      [key]: e.target.checked,
+                    };
+                    setMapLayers(updated);
+                    autoSave("mapLayers", updated);
+                  }}
+                />
+                {key} を表示
+              </label>
+              {key === "避難所" && <p style={styles.note}>※ 現在作成中</p>}
+            </div>
           ))}
         </Modal>
       )}
@@ -382,5 +396,10 @@ const styles: Record<string, React.CSSProperties> = {
     textDecoration: "none",
     fontWeight: 600,
     fontSize: "var(--app-font-size)",
+  },
+  note: {
+    margin: "4px 0 0 24px",
+    fontSize: "0.9em",
+    color: "#6b7280",
   },
 };
