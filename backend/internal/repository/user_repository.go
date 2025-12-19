@@ -28,6 +28,22 @@ func (r *userRepository) FindByID(id uint) (*model.User, error) {
 	return &user, nil
 }
 
+func (r *userRepository) FindByFirebaseUID(firebaseUID string) (*model.User, error) {
+	var user model.User
+	if err := r.db.Where("firebase_uid = ?", firebaseUID).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (r *userRepository) FindByEmail(email string) (*model.User, error) {
+	var user model.User
+	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 func (r *userRepository) FindAll() ([]model.User, error) {
 	var users []model.User
 	if err := r.db.Find(&users).Error; err != nil {

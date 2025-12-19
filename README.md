@@ -29,6 +29,13 @@ zerodelay/
 
 ### Docker Compose（結合テスト）
 
+
+実行前に以下の準備が必要です。
+
+- `backend/serviceAccountKey.json`: Firebase コンソールからダウンロードしたサービスアカウント鍵を配置してください。Railway などでファイルを置けない場合は、同じ JSON の中身を `FIREBASE_CREDENTIALS_JSON` 環境変数に設定しても動作します。
+- `backend/.env`: 少なくとも `DATABASE_URL`（例: `postgres://user:pass@host:5432/dbname`）を定義してください。`docker compose` は `backend/.env` を読み込み、バックエンドコンテナへ環境変数を渡します。
+- `CORS_ALLOWED_ORIGINS`（任意）: ログインAPIは `credentials: "include"` を用いており、CORS 設定に許可されたオリジンのみクッキーが共有されます。本番ドメインで動かす場合は `CORS_ALLOWED_ORIGINS=https://example.com,https://www.example.com` のようにコンマ区切りで設定してください。未設定時は `http://localhost:3000` のみ許可されます。
+
 ```bash
 docker-compose up --build
 ```

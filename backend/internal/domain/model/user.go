@@ -7,17 +7,29 @@ import (
 
 // User represents the users table
 type User struct {
-	ID       uint   `gorm:"primaryKey;autoIncrement" json:"id"`
-	Name     string `gorm:"type:text" json:"name"`
-	NameKana string `gorm:"type:text;column:name_kana" json:"name_kana"`
-	Old      int    `gorm:"type:integer" json:"old"`
-	Sex      string `gorm:"type:text" json:"sex"`
-	Setting  JSON   `gorm:"type:json" json:"setting"`
+	ID          uint   `gorm:"primaryKey;autoIncrement" json:"id"`
+	FirebaseUID string `gorm:"type:text;uniqueIndex;not null" json:"firebase_uid"`
+	Email       string `gorm:"type:text;uniqueIndex;not null" json:"email"`
+	Name        string `gorm:"type:text" json:"name"`
+	NameKana    string `gorm:"type:text;column:name_kana" json:"name_kana"`
+	Old         int    `gorm:"type:integer" json:"old"`
+	Sex         string `gorm:"type:text" json:"sex"`
+	Setting     JSON   `gorm:"type:json" json:"setting"`
 }
 
 // TableName specifies the table name for User model
 func (User) TableName() string {
 	return "users"
+}
+
+// UpdateProfileRequest represents a profile update request
+type UpdateProfileRequest struct {
+	Name     *string `json:"name,omitempty"`
+	NameKana *string `json:"name_kana,omitempty"`
+	Old      *int    `json:"old,omitempty"`
+	Sex      *string `json:"sex,omitempty"`
+	Email    *string `json:"email,omitempty"`
+	Setting  JSON    `json:"setting,omitempty"`
 }
 
 // JSON is a custom type for handling JSON fields in GORM

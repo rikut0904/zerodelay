@@ -7,11 +7,35 @@ import dynamic from "next/dynamic";
 
 const MapView = dynamic(() => import("@/components/MapView"), { ssr: false });
 
+export type HazardType = "flood" | "tsunami" | "landslide" | "avalanche" | "inundation";
+
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [map, setMap] = useState<any>(null);
   const [currentPos, setCurrentPos] = useState<[number, number] | null>(null);
+
+  const [hazardType, setHazardType] = useState<HazardType[]>([]);
+
+  const hazardButtons = [
+    { type: "flood" as const, label: "洪水" },
+    { type: "tsunami" as const, label: "津波" },
+    { type: "landslide" as const, label: "土砂" },
+    { type: "avalanche" as const, label: "雪崩" },
+    { type: "inundation" as const, label: "内水" },
+  ];
+
+  const toggleHazardType = (type: HazardType) => {
+    setHazardType((current) =>{
+      const newTypes = new Set(current);
+      if (newTypes.has(type)) {
+        newTypes.delete(type);
+      }else {
+        newTypes.add(type);
+      }
+      return [...newTypes];
+    });
+  };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -29,15 +53,8 @@ export default function Home() {
 
   return (
     <div style={styles.container}>
-      {/* 🔍 検索バー＋メニューアイコン */}
+      {/* 🔍 メニューアイコン */}
       <div style={styles.header}>
-        <div style={styles.searchBar}>
-          <input
-            type="text"
-            placeholder="住所・施設名を入力"
-            style={styles.searchInput}
-          />
-        </div>
 
         {isMobile && (
           <div
@@ -64,13 +81,25 @@ export default function Home() {
       )}
 
       <div style={styles.buttons}>
-        <button style={styles.button}>洪水</button>
-        <button style={styles.button}>津波</button>
-        <button style={styles.button}>地震</button>
+        {hazardButtons.map(({ type, label }) => (
+          <button
+            key={type}
+            style={{
+              ...styles.buttonBase,
+              ...(hazardType.includes(type) ? styles.buttonOn : styles.buttonOff),
+            }}
+            onClick={() => toggleHazardType(type)}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       <div style={styles.mapArea}>
-        <MapView onMapReady={setMap} onPositionChange={setCurrentPos} />
+        <MapView onMapReady={setMap} 
+        onPositionChange={setCurrentPos} 
+        hazardType={hazardType} 
+        />
 
         <button
           onClick={returnToCurrentLocation}
@@ -162,15 +191,24 @@ const styles: { [key: string]: React.CSSProperties } = {
     justifyContent: "space-around",
     padding: "10px",
   },
-  button: {
+
+  buttonBase: {
     padding: "var(--button-padding)",
-    backgroundColor: "#4A90E2",
-    color: "#fff",
+    color: "#ffff",
     border: "none",
     borderRadius: "6px",
     fontSize: "var(--app-font-size)",
     cursor: "pointer",
   },
+
+  buttonOn:{
+    backgroundColor: "#E74C3C",
+  },
+
+  buttonOff: {
+    backgroundColor: "#4A90E2",
+  },
+
   mapArea: {
     flex: 1,
     height: "100%",

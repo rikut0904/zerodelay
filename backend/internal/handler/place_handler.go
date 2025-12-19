@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -25,11 +26,13 @@ func NewPlaceHandler(placeService *service.PlaceService) *PlaceHandler {
 func (h *PlaceHandler) CreatePlace(c echo.Context) error {
 	var place model.Place
 	if err := c.Bind(&place); err != nil {
+		log.Printf("[WARN] CreatePlace bind failed: %v", err)
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
 	}
 
 	if err := h.placeService.CreatePlace(&place); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		log.Printf("[ERROR] CreatePlace failed: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "場所の作成に失敗しました"})
 	}
 
 	return c.JSON(http.StatusCreated, place)
@@ -47,7 +50,8 @@ func (h *PlaceHandler) GetPlace(c echo.Context) error {
 		if errors.Is(err, service.ErrPlaceNotFound) {
 			return c.JSON(http.StatusNotFound, map[string]string{"error": "Place not found"})
 		}
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		log.Printf("[ERROR] GetPlace failed: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "場所の取得に失敗しました"})
 	}
 
 	return c.JSON(http.StatusOK, place)
@@ -57,7 +61,8 @@ func (h *PlaceHandler) GetPlace(c echo.Context) error {
 func (h *PlaceHandler) GetAllPlaces(c echo.Context) error {
 	places, err := h.placeService.GetAllPlaces()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		log.Printf("[ERROR] GetAllPlaces failed: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "場所の取得に失敗しました"})
 	}
 
 	return c.JSON(http.StatusOK, places)
@@ -72,12 +77,14 @@ func (h *PlaceHandler) UpdatePlace(c echo.Context) error {
 
 	var place model.Place
 	if err := c.Bind(&place); err != nil {
+		log.Printf("[WARN] UpdatePlace bind failed: %v", err)
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
 	}
 	place.ID = uint(id)
 
 	if err := h.placeService.UpdatePlace(&place); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		log.Printf("[ERROR] UpdatePlace failed: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "場所の更新に失敗しました"})
 	}
 
 	return c.JSON(http.StatusOK, place)
@@ -91,7 +98,8 @@ func (h *PlaceHandler) DeletePlace(c echo.Context) error {
 	}
 
 	if err := h.placeService.DeletePlace(uint(id)); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		log.Printf("[ERROR] DeletePlace failed: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "場所の削除に失敗しました"})
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "Place deleted successfully"})
