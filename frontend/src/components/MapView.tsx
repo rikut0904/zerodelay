@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { ScaleControl } from "react-leaflet";
-import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { HazardType } from "@/app/page";
 
@@ -15,12 +14,9 @@ const HAZARD_LAYER_URLS: Record<HazardType, string> = {
   inundation: "https://disaportaldata.gsi.go.jp/raster/02_naisui_pref_data/17/{z}/{x}/{y}.png",
 };
 
-const DefaultIcon = L.icon({
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  iconAnchor: [12, 41],
-});
-L.Marker.prototype.options.icon = DefaultIcon;
+import { shelters } from "@/data/shelters";
+import { shelterMarkerIcon } from "@/lib/mapIcons";
+import { useLayerVisibility } from "@/hooks/useLayerVisibility";
 
 const KIT_POSITION: [number, number] = [36.531029, 136.62774];
 const CITY_HALL_POSITION: [number, number] = [36.5613, 136.6562];
@@ -56,6 +52,7 @@ export default function MapView({
 }) {
   const [position, setPosition] = useState<[number, number] | null>(null);
   const [region, setRegion] = useState("current");
+  const showShelters = useLayerVisibility("避難所");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -144,6 +141,20 @@ export default function MapView({
       <Marker position={position}>
         <Popup>あなたの設定した地域</Popup>
       </Marker>
+      {showShelters &&
+        shelters.map((shelter) => (
+          <Marker
+            key={shelter.id}
+            position={[shelter.lat, shelter.lng]}
+            icon={shelterMarkerIcon}
+          >
+            <Popup>
+              <strong>{shelter.name}</strong>
+              <br />
+              {shelter.address}
+            </Popup>
+          </Marker>
+        ))}
     </MapContainer>
   );
 }

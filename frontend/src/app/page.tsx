@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import dynamic from "next/dynamic";
 
+import { useApplyFontSize } from "@/hooks/useApplyFontSize";
+
 const MapView = dynamic(() => import("@/components/MapView"), { ssr: false });
 
 export type HazardType = "flood" | "tsunami" | "landslide" | "avalanche" | "inundation";
@@ -16,6 +18,7 @@ export default function Home() {
   const [currentPos, setCurrentPos] = useState<[number, number] | null>(null);
 
   const [hazardType, setHazardType] = useState<HazardType[]>([]);
+  useApplyFontSize();
 
   const hazardButtons = [
     { type: "flood" as const, label: "洪水" },
@@ -67,16 +70,29 @@ export default function Home() {
       </div>
 
       {menuOpen && isMobile && (
-        <div style={styles.drawer}>
-          <Link href="/" style={styles.drawerItem}>
-            🏠 ホーム
-          </Link>
-          <Link href="/info" style={styles.drawerItem}>
-            📡 情報
-          </Link>
-          <Link href="/setting" style={styles.drawerItem}>
-            ⚙️ 設定
-          </Link>
+        <div style={styles.drawerOverlay} onClick={() => setMenuOpen(false)}>
+          <div
+            style={styles.drawer}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <div style={styles.drawerHeader}>
+              <span style={styles.drawerTitle}>メニュー</span>
+              <button style={styles.closeButton} onClick={() => setMenuOpen(false)}>
+                ✕
+              </button>
+            </div>
+            <Link href="/" style={styles.drawerItem} onClick={() => setMenuOpen(false)}>
+              🏠 ホーム
+            </Link>
+            <Link href="/info" style={styles.drawerItem} onClick={() => setMenuOpen(false)}>
+              📡 情報
+            </Link>
+            <Link href="/setting" style={styles.drawerItem} onClick={() => setMenuOpen(false)}>
+              ⚙️ 設定
+            </Link>
+          </div>
         </div>
       )}
 
@@ -105,7 +121,7 @@ export default function Home() {
           onClick={returnToCurrentLocation}
           style={{
             position: "absolute",
-            bottom: "20px",
+            bottom: isMobile ? "20px" : "70px",
             right: "20px",
             padding: "10px 14px",
             backgroundColor: "#4A90E2",
@@ -150,7 +166,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   header: {
     display: "flex",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
     backgroundColor: "#fff",
     padding: "8px 12px",
@@ -168,23 +184,54 @@ const styles: { [key: string]: React.CSSProperties } = {
     cursor: "pointer",
   },
   drawer: {
-    position: "absolute",
-    top: 60,
-    right: 10,
+    width: "100%",
     backgroundColor: "#fff",
-    boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
-    borderRadius: "8px",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
     display: "flex",
     flexDirection: "column",
-    zIndex: 1000,
+    borderRadius: "0 0 12px 12px",
+    overflow: "hidden",
+    transform: "translateY(0)",
+    transition: "transform 0.2s ease",
+    maxHeight: "80vh",
+  },
+  drawerOverlay: {
+    position: "fixed",
+    inset: 0,
+    backgroundColor: "rgba(0,0,0,0.35)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    paddingTop: 12,
+    zIndex: 1500,
+  },
+  drawerHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "14px 18px",
+    borderBottom: "1px solid #eee",
+  },
+  drawerTitle: {
+    fontWeight: 700,
+    fontSize: "var(--app-font-size)",
+  },
+  closeButton: {
+    background: "transparent",
+    border: "none",
+    fontSize: 18,
+    cursor: "pointer",
+    padding: 6,
+    lineHeight: 1,
   },
   drawerItem: {
-    padding: "12px 20px",
+    padding: "18px 20px",
     textAlign: "left",
     borderBottom: "1px solid #eee",
     color: "#333",
     textDecoration: "none",
     fontSize: "var(--app-font-size)",
+    fontWeight: 600,
   },
   buttons: {
     display: "flex",
@@ -217,11 +264,17 @@ const styles: { [key: string]: React.CSSProperties } = {
     position: "relative",
   },
   nav: {
+    position: "fixed",
+    bottom: 0,
+    left: 0,
+    width: "100%",
     display: "flex",
     justifyContent: "space-around",
     backgroundColor: "#fff",
     padding: "10px",
     borderTop: "1px solid #ccc",
+    zIndex: 3000,
+    boxShadow: "0 -2px 6px rgba(0,0,0,0.08)",
   },
   link: {
     textDecoration: "none",
