@@ -5,7 +5,7 @@ import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-import { Shelter } from "@/data/shelters";
+import { Shelter } from "@/types/shelter";
 import { currentMarkerIcon, shelterMarkerIcon } from "@/lib/mapIcons";
 import { useLayerVisibility } from "@/hooks/useLayerVisibility";
 
