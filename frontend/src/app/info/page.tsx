@@ -1,10 +1,10 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 
-import { shelters } from "@/data/shelters";
+import type { Shelter } from "@/types/shelter";
 import { useApplyFontSize } from "@/hooks/useApplyFontSize";
 import { useLayerVisibility } from "@/hooks/useLayerVisibility";
 import { useCurrentPosition } from "@/hooks/useCurrentPosition";
@@ -12,7 +12,39 @@ import { useCurrentPosition } from "@/hooks/useCurrentPosition";
 const ShelterMap = dynamic(() => import("@/components/ShelterMap"), { ssr: false });
 
 export default function InfoPage() {
+  const [shelters, setShelters] = useState<Shelter[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  useEffect(() => {
+    const fetchShelters = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/api/v1/places", {
+          credentials: "include",
+        });
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+
+        const converted: Shelter[] = data.map((p: any) => ({
+          id: String(p.id),
+          name: p.name,
+          name_kana: p.name_kana,
+          address: p.address,
+          lat: Number(p.lat),
+          lng: Number(p.lon),
+          url: p.url ?? null,
+          tel: p.tel ?? null,
+        }));
+
+        setShelters(converted);
+      } catch {
+
+      }
+    };
+
+    fetchShelters();
+  }, []);
+
   useApplyFontSize();
   const showShelters = useLayerVisibility("避難所");
   const mapSectionRef = useRef<HTMLDivElement | null>(null);
